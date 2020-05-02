@@ -1,4 +1,8 @@
 {
-  "rulesDirectory": ["node_modules/tslint-microsoft-contrib"],
-  "extends": ["tslint-microsoft-contrib/latest"]
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "rules": {
+    "prefer-const": true,
+    "ordered-imports": false,
+    "curly": [false, "same-line-single-line"]
+  }
 }

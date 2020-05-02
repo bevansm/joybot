@@ -4,7 +4,10 @@
   "description": "a webscrapper and all around good guy for mafia phpbb forms",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn --transpileOnly src/index.ts",
+    "validate": "tslint --project tsconfig.json",
+    "prod": "npm run validate && tsc"
   },
   "repository": {
     "type": "git",
@@ -13,18 +16,23 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mebird/joybot/issues"
-  },
-  "homepage": "https://github.com/mebird/joybot#readme",
   "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "couchbase": "^3.0.1",
+    "cron": "^1.8.2",
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.18",
+    "@types/couchbase": "^2.4.1",
+    "@types/cron": "^1.7.2",
     "@types/express": "^4.17.6",
     "@types/node": "^13.13.4",
+    "ts-node": "^8.9.1",
+    "ts-node-dev": "^1.0.0-pre.44",
     "tslint": "^5.1.0",
-    "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.3"
   }
 }
