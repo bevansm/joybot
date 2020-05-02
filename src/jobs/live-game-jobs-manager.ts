@@ -1,4 +1,4 @@
-import cron, { CronTime, CronCommand, CronJob } from 'cron';
+import cron, { CronTime, CronCommand, CronJob, CronJobParameters } from 'cron';
 
 type Time = string | moment.Moment;
 interface IUpdateConfig {
@@ -10,6 +10,7 @@ export interface IManager {
   createJob: (name: string, cronTime: Time, job: CronCommand) => void;
   stopJob: (name: string) => void;
   updateJob: (name: string, config?: IUpdateConfig) => void;
+  getJobs: () => string[];
 }
 
 const Jobs: { [key: string]: cron.CronJob } = {};
@@ -34,10 +35,12 @@ const Manager: IManager = {
     if (!cronJob) {
       throw new Error(`No job with the name ${name} exists.`);
     }
+
     const { cronTime, job } = config;
     if (job) cronJob.fireOnTick(job);
     if (cronTime) cronJob.setTime(cronTime);
   },
+  getJobs: () => Object.keys(Jobs),
 };
 
 export default Manager;
