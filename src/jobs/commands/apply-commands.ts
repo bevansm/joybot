@@ -1,4 +1,4 @@
-import { createPlayerlist } from './create-playerlist';
+import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import { merge } from 'lodash';
 
 import { isValidHex, areEqual } from '../helpers';
@@ -76,7 +76,7 @@ export const applyCommand = (
       removeHost(args[1], hosts);
       break;
     case Commands.PLAYERLIST:
-      game.players = createPlayerlist($, postContent);
+      createPlayerlist(game, $, postContent);
       break;
     case Commands.PLAYER_ADD:
       args.slice(1).map(p => addPlayer(p, players));
@@ -174,3 +174,18 @@ const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
  */
 const updateConfig = (config: IConfig, options: Partial<IConfig>): any =>
   merge(config, options);
+
+/**
+ * Updates the playerlist. See create-playerlist.ts for more information
+ * @param game
+ * @param $
+ * @param postContent
+ */
+const createPlayerlist = (
+  game: IGame,
+  $: CheerioStatic,
+  postContent: CheerioElement
+): void => {
+  const playerlist = createPlayerlistHelper($, postContent);
+  if (playerlist.length > 0) game.players = playerlist;
+};
