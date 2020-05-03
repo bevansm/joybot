@@ -1,17 +1,22 @@
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import { merge } from 'lodash';
 
-import { isValidHex, areEqual, numOrUndefined } from '../helpers';
+import {
+  isValidHex,
+  areEqual,
+  numOrUndefined,
+  hasUser,
+  getUser,
+} from '../helpers';
 import {
   IHost,
   ISlot,
-  IUser,
   IGame,
-  DefaultSlot,
+  createDefaultSlot,
   IConfig,
 } from '../../models/data-types';
 
-export enum Commands {
+export enum HostCommands {
   RESET = 'reset',
   HOST_ADD = 'add-host',
   HOST_REMOVE = 'remove-hosts',
@@ -33,7 +38,7 @@ export enum Commands {
  * @param $
  * @param postContent
  */
-export const applyCommands = (
+export const applyHostCommand = (
   game: IGame,
   commandString: string,
   $?: CheerioStatic,
@@ -67,52 +72,52 @@ export const applyCommand = (
   const { hosts, players, config } = game;
 
   switch (args[0]) {
-    case Commands.RESET:
-      game.voteCount = {};
-      break;
-    case Commands.HOST_ADD:
-      addHost(args[1], args[2], hosts);
-      break;
-    case Commands.HOST_REMOVE:
-      removeHost(args[1], hosts);
-      break;
-    case Commands.PLAYERLIST:
-      createPlayerlist(game, $, postContent);
-      break;
-    case Commands.PLAYER_ADD:
-      args.slice(1).map(p => addPlayer(p, players));
-      break;
-    case Commands.PLAYER_KILL:
-      args.slice(1).map(p => updatePlayer(p, players, { isAlive: false }));
-      break;
-    case Commands.PLAYER_REPLACE:
-      replacePlayer(args[1], args[2], game);
-      break;
-    case Commands.CHANGE_WEIGHT:
-      updatePlayer(args[1], players, {
-        voteWeight: numArg2,
-        voteablePlayers: numArg3,
+    case HostCommands.RESET:
+      players.forEach(p => {
+        p.votedBy = [];
+        p.voting = [];
       });
       break;
-    case Commands.CHANGE_VOTES_NEEDED:
-      updatePlayer(args[1], players, { votesNeeded: numArg2 });
+    case HostCommands.HOST_ADD:
+      addHost(args[1], args[2], hosts);
       break;
-    case Commands.MAJORITY:
+    case HostCommands.HOST_REMOVE:
+      removeHost(args[1], hosts);
+      break;
+    case HostCommands.PLAYERLIST:
+      createPlayerlist(game, $, postContent);
+      break;
+    case HostCommands.PLAYER_ADD:
+      args.slice(1).map(p => addPlayer(p, players));
+      break;
+    case HostCommands.PLAYER_KILL:
+      args.slice(1).map(p => updatePlayer(p, players, { isAlive: false }));
+      break;
+    case HostCommands.PLAYER_REPLACE:
+      replacePlayer(args[1], args[2], game);
+      break;
+    case HostCommands.CHANGE_WEIGHT:
+      updatePlayer(args[1], players, {
+        voteWeight: numArg2,
+        canVoteCount: numArg3,
+      });
+      break;
+    case HostCommands.CHANGE_VOTES_NEEDED:
+      updatePlayer(args[1], players, { extraVotesToLynch: numArg2 });
+      break;
+    case HostCommands.MAJORITY:
       updateConfig(config, { majority: numArg1 });
       break;
-    case Commands.EVERY:
+    case HostCommands.EVERY:
       updateConfig(config, { interval: numArg1 });
       break;
-    case Commands.AUTOLOCK:
+    case HostCommands.AUTOLOCK:
       updateConfig(config, { autolock: Boolean(args[1]) });
       break;
     default:
     // Do nothing
   }
 };
-
-const hasUser = (user: string, users: IUser[]): boolean =>
-  !users.every(u => !areEqual(user, u.name));
 
 const addHost = (name: string, hex: string = '', hosts: IHost[]): void => {
   if (!name || hasUser(name, hosts)) return;
@@ -127,7 +132,7 @@ const removeHost = (host: string = '', hosts: IHost[]): void => {
 
 const addPlayer = (name: string, players: ISlot[]): void => {
   if (!name || hasUser(name, players)) return;
-  players.push({ ...DefaultSlot, name, history: [] });
+  players.push(createDefaultSlot({ name }));
 };
 
 /**
@@ -141,18 +146,18 @@ const updatePlayer = (
   players: ISlot[],
   options: Partial<ISlot>
 ): void => {
-  const player = players.find(p => areEqual(name, p.name));
+  const player = getUser(name, players);
   if (player) merge(player, options);
 };
 
 const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
-  const { players, voteCount } = game;
+  const { players } = game;
   if (oldName && newName && !areEqual(oldName, newName)) {
     // Check if the player we're trying to replace in is already in the game
     if (hasUser(newName, players)) return;
 
     // Grab the old player's slot w/ case insensitivity
-    const player = players.find(p => areEqual(oldName, p.name));
+    const player = getUser(oldName, players) as ISlot;
     if (!player) return;
 
     // Grab the actual name we were using to key the player
@@ -161,13 +166,6 @@ const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
     // Update the player's slot info
     player.history.push(oldName);
     player.name = newName;
-    voteCount[newName] = voteCount[oldName];
-    delete voteCount[oldName];
-
-    // Update the votecount to reflect the player change
-    Object.keys(voteCount).forEach(
-      k => (voteCount[k] = voteCount[k].map(n => (n === oldName ? newName : n)))
-    );
   }
 };
 

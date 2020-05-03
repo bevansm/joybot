@@ -45,12 +45,12 @@
   "jest": {
     "roots": [
       "<rootDir>/src",
+      "<rootDir>/src/jobs",
       "<rootDir>"
     ],
     "testMatch": [
       "**/__tests__/**/*.+(ts|tsx|js)",
       "**/**/__tests__/**/*.+(ts|tsx|js)",
-      "**/**/**/__tests__/**/*.+(ts|tsx|js)",
       "**/?(*.)+(spec|test).+(ts|tsx|js)"
     ],
     "transform": {

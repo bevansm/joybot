@@ -1,4 +1,4 @@
-import { ISlot, DefaultSlot } from './../../models/data-types';
+import { ISlot, createDefaultSlot } from './../../models/data-types';
 
 // The list of substrings that joybot will look for
 const playerlistTitles = ['playerlist', 'players'];
@@ -28,5 +28,7 @@ export const createPlayerlist = (
     .children('li')
     .map((_, e) => $(e).text().split(' ')[0].trim())
     .toArray() as unknown) as string[];
-  return playerNames.map(name => ({ ...DefaultSlot, name, history: [] }));
+  return playerNames.map((name, slotNumber) =>
+    createDefaultSlot({ name, slotNumber })
+  );
 };

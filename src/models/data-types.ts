@@ -1,10 +1,20 @@
+import { merge } from 'lodash';
+
+export interface IVote {
+  slotNumber: number;
+  weight: number;
+}
+
 export interface ISlot {
   name: string;
+  slotNumber: number;
   history: string[];
   isAlive: boolean;
+  voting: IVote[];
+  votedBy: IVote[];
   voteWeight: number;
-  votesNeeded: number;
-  voteablePlayers: number;
+  canVoteCount: number;
+  extraVotesToLynch: number;
 }
 
 export interface IHost {
@@ -12,7 +22,7 @@ export interface IHost {
   hex: string;
 }
 
-export type IUser = ISlot | IHost;
+export type INamed = ISlot | IHost;
 
 export interface IConfig {
   interval?: number;
@@ -24,7 +34,6 @@ type GameType = 'VFM' | 'SFM' | 'EP' | 'NFM' | 'AFFM';
 
 export interface IGame {
   config: IConfig;
-  voteCount: { [key: string]: string[] };
   id: string;
   lastVotecount: string;
   type: GameType;
@@ -40,13 +49,19 @@ export const DefaultConfig: IConfig = {
   majority: 1,
 };
 
-export const DefaultSlot: ISlot = {
+const DefaultSlot: ISlot = {
   name: '',
   isAlive: true,
-  history: null,
+  slotNumber: -1,
   voteWeight: 1,
-  votesNeeded: 1,
-  voteablePlayers: 1,
+  extraVotesToLynch: 1,
+  canVoteCount: 1,
+  history: null,
+  voting: null,
+  votedBy: null,
 };
+
+export const createDefaultSlot = (config?: Partial<ISlot>): ISlot =>
+  merge({}, DefaultSlot, { history: [], voting: [], votedBy: [] }, config);
 
 export default DefaultConfig;

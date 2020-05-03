@@ -5,7 +5,7 @@ import { createPlayerlist } from '../create-playerlist';
 
 describe('playerlist creation', () => {
   const playerlistOp = fs.readFileSync(
-    path.resolve(__dirname, '../../../../res/post-op-thirteen-players.html')
+    path.resolve(__dirname, '../../../../res/post-op-twelve-players.html')
   );
   const playerListNone = fs.readFileSync(
     path.resolve(__dirname, '../../../../res/post-joybot-init.html')
@@ -15,7 +15,7 @@ describe('playerlist creation', () => {
     const $ = cheerio.load(playerlistOp);
     const postContent = $('div.content')[0];
     const playerlist = createPlayerlist($, postContent);
-    expect(playerlist.length).toBe(13);
+    expect(playerlist.length).toBe(12);
     expect(playerlist[0].name).toBe('Varanus');
   });
 
