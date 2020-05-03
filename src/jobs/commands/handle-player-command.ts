@@ -2,6 +2,7 @@ import { IVote } from './../../models/data-types';
 import { hasUser } from './../helpers';
 import { ISlot, IGame } from '../../models/data-types';
 import { getUser } from '../helpers';
+import { removeAllVotes } from './update-slot-common';
 
 export enum PlayerCommands {
   VOTE = 'vote',
@@ -9,7 +10,6 @@ export enum PlayerCommands {
 }
 
 /**
- * This is ugly.
  * @param command - a command in the form /abcdef
  * @param rawName - the name of the player who made the command
  * @param game
@@ -28,74 +28,68 @@ export const handlePlayerCommand = (
   const player = getUser(rawName, players) as ISlot;
   if (!player) return null;
 
-  const commands = commandString.split('/').map(c => c.trim());
-
+  const commands = commandString
+    .split('/')
+    .map(c => c.trim())
+    .filter(c => !!c);
   while (commands.length > 0) {
     const args = commands
       .pop()
       .split(' ')
       .map(c => c.trim());
-    const command = args[0];
-    const target = getUser(args[1], players) as ISlot;
+    const target = getUser(args[1] || '', players) as ISlot;
 
     const {
       voting: playerVoting,
       slotNumber: playerSlot,
-      canVoteCount: playerCanVote,
+      canSplitVote: playerCanSplitVote,
       voteWeight: playerVoteWeight,
     } = player;
     const votesFromPlayerWeight = sumVotes(playerVoting);
+    const playerHasVotes = playerVoteWeight < votesFromPlayerWeight;
 
-    const { slotNumber: targetSlot, votedBy: targetVotedBy = [] } = target;
+    const { slotNumber: targetSlot, votedBy: targetVotedBy = [] } =
+      target || {};
 
     let playerVote: IVote;
     let targetVote: IVote;
     let prevTarget: ISlot;
 
-    switch (command.toLowerCase()) {
+    switch (args[0].toLowerCase()) {
       case PlayerCommands.UNVOTE:
         if (target) {
           target.votedBy = removeVote(playerSlot, targetVotedBy);
           player.voting = removeVote(targetSlot, playerVoting);
         } else {
-          player.voting.forEach(v => {
-            const { slotNumber } = v;
-            const votedPlayer = players[slotNumber];
-            const { votedBy: votedVotedBy } = votedPlayer;
-            votedPlayer.votedBy = removeVote(playerSlot, votedVotedBy);
-          });
-          player.voting = [];
+          removeAllVotes(player, players);
         }
         break;
       case PlayerCommands.VOTE:
         if (!target) {
           break;
-        } else if (
-          playerCanVote > 1 &&
-          playerVoteWeight < votesFromPlayerWeight
-        ) {
-          playerVote = { slotNumber: targetSlot, weight: 1 };
+        } else if (playerCanSplitVote && playerHasVotes) {
           targetVote = { slotNumber: playerSlot, weight: 1 };
           target.votedBy = addVote(targetVote, targetVotedBy);
+
+          playerVote = { slotNumber: targetSlot, weight: 1 };
           player.voting = addVote(playerVote, playerVoting);
-
-          if (isLynched(target, majority)) return target;
-        } else if (playerCanVote === 1) {
-          playerVote = { slotNumber: targetSlot, weight: playerVoteWeight };
+        } else if (!playerCanSplitVote) {
           targetVote = { slotNumber: playerSlot, weight: playerVoteWeight };
-
           target.votedBy = addVote(targetVote, targetVotedBy);
 
-          prevTarget = players[playerVoting[0].slotNumber];
-          prevTarget.votedBy = removeVote(
-            playerVoting[0].slotNumber,
-            prevTarget.votedBy
-          );
+          // If the player was previously voting someone, unvote them.
+          if (playerVoting[0]) {
+            prevTarget = players[playerVoting[0].slotNumber];
+            prevTarget.votedBy = removeVote(playerSlot, prevTarget.votedBy);
+          }
 
+          playerVote = {
+            slotNumber: targetSlot,
+            weight: playerVoteWeight,
+          };
           player.voting = [playerVote];
-
-          if (isLynched(target, majority)) return target;
         }
+        if (isLynched(target, majority)) return target;
         break;
       default:
         break;
@@ -104,7 +98,7 @@ export const handlePlayerCommand = (
   return null;
 };
 
-const removeVote = (slotNumber: number, votes: IVote[]): IVote[] =>
+export const removeVote = (slotNumber: number, votes: IVote[]): IVote[] =>
   votes.filter(v => v.slotNumber !== slotNumber);
 
 const addVote = (vote: IVote, votes: IVote[]): IVote[] => [...votes, vote];

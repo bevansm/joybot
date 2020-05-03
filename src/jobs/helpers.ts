@@ -11,6 +11,13 @@ export const numOrUndefined = (str: string): number => {
   return isNaN(parsed) ? undefined : parsed;
 };
 
+export const boolOrUndefined = (str: string): boolean => {
+  if (!str) return undefined;
+  if (areEqual(str, 'false')) return false;
+  if (areEqual(str, 'true')) return true;
+  return undefined;
+};
+
 export const hasUser = (user: string, users: INamed[]): boolean =>
   !users.every(u => !areEqual(user, u.name));
 

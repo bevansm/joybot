@@ -13,7 +13,7 @@ export interface ISlot {
   voting: IVote[];
   votedBy: IVote[];
   voteWeight: number;
-  canVoteCount: number;
+  canSplitVote: boolean;
   extraVotesToLynch: number;
 }
 
@@ -55,7 +55,7 @@ const DefaultSlot: ISlot = {
   slotNumber: -1,
   voteWeight: 1,
   extraVotesToLynch: 1,
-  canVoteCount: 1,
+  canSplitVote: false,
   history: null,
   voting: null,
   votedBy: null,

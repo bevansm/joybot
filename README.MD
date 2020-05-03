@@ -14,8 +14,9 @@ JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
 ## Completed features
 
 - [x] Basic cron job management
-- [x] Command parsing
-- [ ] Player parsing
+- [x] Host cmmand parsing
+- [ ] Checking if host actions cause player death
+- [x] Player command parsing
 - [x] Automatic playerlist generation
 - [x] Monitoring active games
 - [ ] Parsing posts from active games
@@ -53,7 +54,8 @@ To start JoyBot, include the line
 - `--add-players {player 1} {player 2}`: Adds a player(s) to the live playerlist.
 - `--kill-players {player 1} {player 2}`: Removes a player(s) from the live playerlist and sets their vote weight to 0. Note that you can give dead players votes!
 - `--replace-player {player 1} {player 2}`: Replaces player 1 with player 2.
-- `--change-weight {player name} {weight} {split?}`: Updates the weight of a player's vote. Default vote weight is one. If `split` is true, then this allows the player to vote multiple players if their vote weight is greater than `1`. Each of their votes will have a wieght of `1`.
+- `--change-weight {player name} {weight} {split?}`: Updates the weight of a player's vote. Default vote weight is one. If `split` is true, then this allows the player to vote multiple players if their vote weight is greater than `1`. Each of their votes will have a weight of `1`.
+  - Toggling on or off split will cause the player to remote all of their votes.
 - `--change-votes-needed {player name} {+/-}{weight}`: Updates the number of votes needed to lynch a player by `+/-` from maj, i.e. if maj is `4` and a host has run `!joybot +2`, the player will need to have `6` votes to be lynched. If maj changes to `3`, then the player will need `5` votes to be lynched.
 
 After the initial command, JoyBot will only listen to in-thread commands from the person who created the configuration and any listed hosts. A host can add another host at any time.

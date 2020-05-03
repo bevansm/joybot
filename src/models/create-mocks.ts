@@ -1,8 +1,4 @@
-import DefaultConfig, {
-  IGame,
-  createDefaultSlot,
-  ISlot,
-} from './data-types';
+import DefaultConfig, { IGame, createDefaultSlot, ISlot } from './data-types';
 export const createGame = (): IGame => {
   return {
     config: { ...DefaultConfig },
@@ -33,6 +29,7 @@ export const createPlayers = (): ISlot[] => {
         { slotNumber: (n + 2) % 3, weight: 1 },
       ],
       voteWeight: 2,
+      canSplitVote: true,
     })
   );
   players.push(

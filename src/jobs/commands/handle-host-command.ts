@@ -1,5 +1,7 @@
+import { boolOrUndefined } from './../helpers';
+import { removeAllVotes } from './update-slot-common';
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
-import { merge } from 'lodash';
+import { merge, isUndefined } from 'lodash';
 
 import {
   isValidHex,
@@ -58,6 +60,7 @@ export const applyHostCommand = (
  * @param command
  * @param $
  * @param postContent
+ * @returns the slot that would be lynched, if any
  */
 export const applyCommand = (
   game: IGame,
@@ -68,7 +71,7 @@ export const applyCommand = (
   const args = command.split(' ').map(c => c.trim());
   const numArg1 = numOrUndefined(args[1]);
   const numArg2 = numOrUndefined(args[2]);
-  const numArg3 = numOrUndefined(args[3]);
+  const boolArg3 = boolOrUndefined(args[3]);
   const { hosts, players, config } = game;
 
   switch (args[0]) {
@@ -97,10 +100,7 @@ export const applyCommand = (
       replacePlayer(args[1], args[2], game);
       break;
     case HostCommands.CHANGE_WEIGHT:
-      updatePlayer(args[1], players, {
-        voteWeight: numArg2,
-        canVoteCount: numArg3,
-      });
+      updatePlayerVoteWeight(args[1], players, numArg2, boolArg3);
       break;
     case HostCommands.CHANGE_VOTES_NEEDED:
       updatePlayer(args[1], players, { extraVotesToLynch: numArg2 });
@@ -166,6 +166,23 @@ const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
     // Update the player's slot info
     player.history.push(oldName);
     player.name = newName;
+  }
+};
+
+const updatePlayerVoteWeight = (
+  name: string,
+  players: ISlot[],
+  weight: number,
+  splitVote: boolean
+): void => {
+  const player = getUser(name, players) as ISlot;
+  if (player && (weight || !isUndefined(splitVote))) {
+    removeAllVotes(player, players);
+    const options: Partial<ISlot> = {
+      voteWeight: weight,
+      canSplitVote: Boolean(splitVote),
+    };
+    merge(player, options);
   }
 };
 
