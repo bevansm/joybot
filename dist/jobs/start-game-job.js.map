@@ -1,0 +1,1 @@
+{"version":3,"file":"start-game-job.js","sourceRoot":"","sources":["../../src/jobs/start-game-job.ts"],"names":[],"mappings":";;;;;;;;;;;AAAa,QAAA,YAAY,GAAG,CAAO,WAAmB,EAAiB,EAAE;IACvE,MAAM,OAAO,GAAG,GAAG,OAAO,CAAC,GAAG,CAAC,SAAS,oBAAoB,OAAO,CAAC,GAAG,CAAC,QAAQ,MAAM,WAAW,EAAE,CAAC;IACpG,OAAO,IAAI,CAAC;AACd,CAAC,CAAA,CAAC;AAEF,kBAAe,oBAAY,CAAC"}

@@ -2,7 +2,7 @@ import axios from 'axios';
 import path from 'path';
 import fs from 'fs';
 
-import { getActiveGames } from '../check-games';
+import { getActiveGames } from '../check-games-job';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -13,9 +13,7 @@ describe('game management tests', () => {
     oldEnvValue = process.env.POSTS_PER_PAGE;
     process.env.POSTS_PER_PAGE = '25';
   });
-  afterAll(() => {
-    process.env.POSTS_PER_PAGE = oldEnvValue;
-  });
+  afterAll(() => (process.env.POSTS_PER_PAGE = oldEnvValue));
 
   const noGames = fs
     .readFileSync(

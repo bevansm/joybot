@@ -5,6 +5,9 @@ declare global {
       FORUM_URL: string;
       GAMES_ID: string;
 
+      USER: string;
+      PASSWORD: string;
+
       // The default time between posted votecounts.
       DEFAULT_VOTECOUNT_TIMEOUT: string;
 

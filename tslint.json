@@ -4,6 +4,7 @@
     "prefer-const": true,
     "ordered-imports": false,
     "curly": [false, "same-line-single-line"],
-    "strict-type-predicates": true
+    "strict-type-predicates": true,
+    "object-literal-sort-keys": false
   }
 }

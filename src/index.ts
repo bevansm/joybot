@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
-import userHandler from './routes/users';
-import gamesHandler from './routes/games';
+import userHandler from './api/users';
+import gamesHandler from './api/games';
 
 dotenv.config();
 const app = express();
