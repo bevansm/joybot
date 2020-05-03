@@ -15,6 +15,7 @@ JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
 
 - [x] Basic cron job management
 - [x] Command parsing
+- [ ] Player parsing
 - [x] Automatic playerlist generation
 - [x] Monitoring active games
 - [ ] Parsing posts from active games

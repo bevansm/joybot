@@ -1,7 +1,7 @@
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import { merge } from 'lodash';
 
-import { isValidHex, areEqual } from '../helpers';
+import { isValidHex, areEqual, numOrUndefined } from '../helpers';
 import {
   IHost,
   ISlot,
@@ -61,8 +61,9 @@ export const applyCommand = (
   postContent?: CheerioElement
 ): void => {
   const args = command.split(' ').map(c => c.trim());
-  const numArg1 = isNaN(Number(args[1])) ? undefined : Number(args[1]);
-  const numArg2 = isNaN(Number(args[2])) ? undefined : Number(args[2]);
+  const numArg1 = numOrUndefined(args[1]);
+  const numArg2 = numOrUndefined(args[2]);
+  const numArg3 = numOrUndefined(args[3]);
   const { hosts, players, config } = game;
 
   switch (args[0]) {
@@ -88,7 +89,10 @@ export const applyCommand = (
       replacePlayer(args[1], args[2], game);
       break;
     case Commands.CHANGE_WEIGHT:
-      updatePlayer(args[1], players, { voteWeight: numArg2 });
+      updatePlayer(args[1], players, {
+        voteWeight: numArg2,
+        voteablePlayers: numArg3,
+      });
       break;
     case Commands.CHANGE_VOTES_NEEDED:
       updatePlayer(args[1], players, { votesNeeded: numArg2 });
