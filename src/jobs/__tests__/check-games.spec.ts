@@ -30,7 +30,11 @@ describe('game management tests', () => {
   describe('getGames tests', () => {
     it('should return no games if there are none', async () => {
       // @ts-ignore
-      mockedAxios.get.mockReturnValueOnce(Promise.resolve({ data: noGames }));
+      mockedAxios.get.mockReturnValueOnce(
+        Promise.resolve({
+          data: noGames,
+        })
+      );
       const games = await getActiveGames();
       expect(games.length).toEqual(0);
     });
