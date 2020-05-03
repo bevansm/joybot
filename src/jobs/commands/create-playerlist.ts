@@ -1,9 +1,9 @@
-import { ISlot } from './../../models/data-types';
+import { ISlot, DefaultSlot } from './../../models/data-types';
 
 // The list of substrings that joybot will look for
 const playerlistTitles = ['playerlist', 'players'];
 const playerlistSelectorString = playerlistTitles
-  .map(p => `:contains(${p})`)
+  .map(p => `:icontains("${p}")`)
   .join(', ');
 
 /**
@@ -22,7 +22,11 @@ export const createPlayerlist = (
   $: CheerioStatic,
   postContent: CheerioElement
 ): ISlot[] => {
-  const playerlists = $(postContent).find(playerlistSelectorString).next('ol');
-  console.log(playerlists.length);
-  return null;
+  const playerNames = ($(postContent)
+    .find(playerlistSelectorString)
+    .next('ol')
+    .children('li')
+    .map((_, e) => $(e).text().split(' ')[0].trim())
+    .toArray() as unknown) as string[];
+  return playerNames.map(name => ({ ...DefaultSlot, name, history: [] }));
 };
