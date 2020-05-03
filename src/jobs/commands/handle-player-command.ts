@@ -65,7 +65,7 @@ export const handlePlayerCommand = (
         }
         break;
       case PlayerCommands.VOTE:
-        if (!target) {
+        if (!target || !target.isAlive) {
           break;
         } else if (playerCanSplitVote && playerHasVotes) {
           targetVote = { slotNumber: playerSlot, weight: 1 };

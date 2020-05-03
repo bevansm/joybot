@@ -32,16 +32,30 @@ export interface IConfig {
 
 type GameType = 'VFM' | 'SFM' | 'EP' | 'NFM' | 'AFFM';
 
-export interface IGame {
-  config: IConfig;
-  id: string;
-  lastVotecount: string;
+interface IGameInfo {
   type: GameType;
   number: number;
   title: string;
+}
+
+interface IThreadLocation {
+  page: number;
+  post: string;
+}
+
+export interface IGame {
+  config: IConfig;
+  id: string;
   hosts: IHost[];
   players: ISlot[];
+  info?: IGameInfo;
+  loc?: IThreadLocation;
 }
+
+const DefaultLocation: IThreadLocation = {
+  page: 0,
+  post: '',
+};
 
 export const DefaultConfig: IConfig = {
   interval: 60,
@@ -63,5 +77,14 @@ const DefaultSlot: ISlot = {
 
 export const createDefaultSlot = (config?: Partial<ISlot>): ISlot =>
   merge({}, DefaultSlot, { history: [], voting: [], votedBy: [] }, config);
+
+export const createDefaultGame = (id: string, info: IGameInfo): IGame => ({
+  id,
+  hosts: [],
+  players: [],
+  config: { ...DefaultConfig },
+  loc: { ...DefaultLocation },
+  info: { ...info },
+});
 
 export default DefaultConfig;

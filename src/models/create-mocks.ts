@@ -1,19 +1,21 @@
-import DefaultConfig, { IGame, createDefaultSlot, ISlot } from './data-types';
-export const createGame = (): IGame => {
-  return {
-    config: { ...DefaultConfig },
-    id: '430',
-    lastVotecount: '430',
-    type: 'SFM',
-    number: 50,
-    hosts: [{ name: 'jimmy', hex: '#900' }],
-    title: 'Test',
-    players: [
-      createDefaultSlot({ name: 'jerry' }),
-      createDefaultSlot({ name: 'swords' }),
-    ],
-  };
-};
+import {
+  IGame,
+  ISlot,
+  createDefaultGame,
+  createDefaultSlot,
+} from './data-types';
+export const createGame = (): IGame => ({
+  ...createDefaultGame('430', {
+    number: 56,
+    title: 'jammies',
+    type: 'AFFM',
+  }),
+  hosts: [{ name: 'jimmy', hex: '#900' }],
+  players: [
+    createDefaultSlot({ name: 'jerry' }),
+    createDefaultSlot({ name: 'swords' }),
+  ],
+});
 
 export const createPlayers = (): ISlot[] => {
   const players = [0, 1, 2].map(n =>
