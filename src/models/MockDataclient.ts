@@ -1,8 +1,8 @@
-import { createGame } from './create-mocks';
+import { createMockGame } from './create-mocks';
 import IDataclient from './IDataclient';
 
 const MockDataclient: IDataclient = {
-  getGame: () => Promise.resolve(createGame()),
+  getGame: () => Promise.resolve(createMockGame()),
   updateGame: () => Promise.resolve(),
 };
 

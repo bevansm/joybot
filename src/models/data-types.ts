@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import { numOrUndefined } from '../helpers';
 
 export interface IVote {
   slotNumber: number;
@@ -25,40 +26,55 @@ export interface IHost {
 export type INamed = ISlot | IHost;
 
 export interface IConfig {
-  interval?: number;
-  autolock?: boolean;
+  interval: number;
+  autolock: boolean;
   majority: number;
 }
 
-type GameType = 'VFM' | 'SFM' | 'EP' | 'NFM' | 'AFFM';
-
-interface IGameInfo {
-  type: GameType;
-  number: number;
-  title: string;
+export enum GameType {
+  VFM = 'VFM',
+  SFM = 'SFM',
+  TFM = 'TFM',
+  CFM = 'CFM',
+  GFM = 'GFM',
+  EVENT = 'E',
+  ALL_STARS = 'ASG',
+  EPISODE = 'EP',
+  NFM = 'NFM',
+  APRILFOOLS = 'AFFM',
+  STANDARD = 'STANDARD',
+  UNKNOWN = 'UNKNOWN',
 }
 
-interface IThreadLocation {
+export interface IGameInfo {
+  type: GameType;
+  gameNumber: number;
+  title: string;
+  letter?: string;
+}
+
+export interface IThreadLocation {
   page: number;
   post: string;
 }
 
-export interface IGame {
+interface IGameMain {
   config: IConfig;
   id: string;
   hosts: IHost[];
   players: ISlot[];
-  info?: IGameInfo;
   loc?: IThreadLocation;
 }
 
-const DefaultLocation: IThreadLocation = {
+export type IGame = IGameMain & Partial<IGameInfo>;
+
+export const DefaultLocation: IThreadLocation = {
   page: 0,
   post: '',
 };
 
 export const DefaultConfig: IConfig = {
-  interval: 60,
+  interval: numOrUndefined(process.env.DEFAULT_VOTECOUNT_TIMEOUT) || 60,
   autolock: false,
   majority: 1,
 };
@@ -75,16 +91,29 @@ const DefaultSlot: ISlot = {
   votedBy: null,
 };
 
-export const createDefaultSlot = (config?: Partial<ISlot>): ISlot =>
+export const createSlot = (config?: Partial<ISlot>): ISlot =>
   merge({}, DefaultSlot, { history: [], voting: [], votedBy: [] }, config);
 
-export const createDefaultGame = (id: string, info: IGameInfo): IGame => ({
-  id,
-  hosts: [],
-  players: [],
-  config: { ...DefaultConfig },
-  loc: { ...DefaultLocation },
-  info: { ...info },
-});
+export const createGame = (id: string, info: IGameInfo): IGame =>
+  merge(
+    {
+      id,
+      hosts: [],
+      players: [],
+      config: { ...DefaultConfig },
+      loc: { ...DefaultLocation },
+    },
+    { info }
+  );
+
+export const createInfo = (config?: Partial<IGameInfo>): IGameInfo =>
+  merge(
+    {
+      type: GameType.UNKNOWN,
+      gameNumber: 0,
+      title: '???',
+    },
+    config
+  );
 
 export default DefaultConfig;

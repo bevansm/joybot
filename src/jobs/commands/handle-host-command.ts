@@ -1,27 +1,30 @@
-import { boolOrUndefined } from './../helpers';
-import { removeAllVotes } from './update-slot-common';
-import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import { merge, isUndefined } from 'lodash';
 
-import {
-  isValidHex,
-  areEqual,
-  numOrUndefined,
-  hasUser,
-  getUser,
-} from '../helpers';
 import {
   IHost,
   ISlot,
   IGame,
-  createDefaultSlot,
+  createSlot,
   IConfig,
 } from '../../models/data-types';
 
+import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
+import {
+  isValidHex,
+  isEqual,
+  numOrUndefined,
+  boolOrUndefined,
+  hasUser,
+  getUser,
+} from '../../helpers';
+import { removeAllVotes } from './update-slot-common';
+
 export enum HostCommands {
+  PRINT = 'print',
   RESET = 'reset',
   HOST_ADD = 'add-host',
   HOST_REMOVE = 'remove-hosts',
+  HOST_COLOR = 'set-host-color',
   PLAYERLIST = 'create-playerlist',
   PLAYER_ADD = 'add-players',
   PLAYER_KILL = 'kill-players',
@@ -45,12 +48,12 @@ export const applyHostCommand = (
   commandString: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
-): void => {
+): boolean => {
   const startCommand = process.env.START_COMMAND;
-  commandString
+  return commandString
     .substring(commandString.indexOf(startCommand) + 1)
     .split('--')
-    .map(c => applyCommand(game, c.trim(), $, postContent));
+    .reduce((a, c) => a && applyCommand(game, c.trim(), $, postContent), false);
 };
 
 /**
@@ -67,14 +70,17 @@ export const applyCommand = (
   command: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
-): void => {
+): boolean => {
   const args = command.split(' ').map(c => c.trim());
   const numArg1 = numOrUndefined(args[1]);
   const numArg2 = numOrUndefined(args[2]);
+  const boolArg1 = boolOrUndefined(args[1]);
   const boolArg3 = boolOrUndefined(args[3]);
   const { hosts, players, config } = game;
 
   switch (args[0]) {
+    case HostCommands.PRINT:
+      if (!isUndefined(boolArg1)) return boolArg1;
     case HostCommands.RESET:
       players.forEach(p => {
         p.votedBy = [];
@@ -86,6 +92,9 @@ export const applyCommand = (
       break;
     case HostCommands.HOST_REMOVE:
       removeHost(args[1], hosts);
+      break;
+    case HostCommands.HOST_COLOR:
+      updateHostColor(args[1], hosts, args[2]);
       break;
     case HostCommands.PLAYERLIST:
       createPlayerlist(game, $, postContent);
@@ -117,6 +126,7 @@ export const applyCommand = (
     default:
     // Do nothing
   }
+  return false;
 };
 
 const addHost = (name: string, hex: string = '', hosts: IHost[]): void => {
@@ -126,13 +136,23 @@ const addHost = (name: string, hex: string = '', hosts: IHost[]): void => {
 };
 
 const removeHost = (host: string = '', hosts: IHost[]): void => {
-  const index = hosts.findIndex(h => areEqual(h.name, host));
+  const index = hosts.findIndex(h => isEqual(h.name, host));
   if (index > -1) hosts.splice(index, 1);
+};
+
+const updateHostColor = (
+  name: string = '',
+  hosts: IHost[],
+  color: string
+): void => {
+  const host = getUser(name, hosts) as IHost;
+  if (!host || !isValidHex(color)) return;
+  host.hex = color;
 };
 
 const addPlayer = (name: string, players: ISlot[]): void => {
   if (!name || hasUser(name, players)) return;
-  players.push(createDefaultSlot({ name }));
+  players.push(createSlot({ name }));
 };
 
 /**
@@ -152,7 +172,7 @@ const updatePlayer = (
 
 const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
   const { players } = game;
-  if (oldName && newName && !areEqual(oldName, newName)) {
+  if (oldName && newName && !isEqual(oldName, newName)) {
     // Check if the player we're trying to replace in is already in the game
     if (hasUser(newName, players)) return;
 
@@ -176,7 +196,7 @@ const updatePlayerVoteWeight = (
   splitVote: boolean
 ): void => {
   const player = getUser(name, players) as ISlot;
-  if (player && (weight || !isUndefined(splitVote))) {
+  if (player && (!isUndefined(weight) || !isUndefined(splitVote))) {
     removeAllVotes(player, players);
     const options: Partial<ISlot> = {
       voteWeight: weight,

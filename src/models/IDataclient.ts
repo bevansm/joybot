@@ -1,7 +1,7 @@
 import { IGame } from './data-types';
 
 interface IDataclient {
-  getGame: (game: number) => Promise<IGame>;
+  getGame: (game: string) => Promise<IGame>;
   updateGame: (game: IGame) => Promise<void>;
 }
 

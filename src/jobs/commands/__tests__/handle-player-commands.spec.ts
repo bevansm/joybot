@@ -4,14 +4,17 @@ import {
 } from './../handle-player-command';
 
 import { IVote, ISlot } from './../../../models/data-types';
-import { createGame, createPlayers } from '../../../models/create-mocks';
+import {
+  createMockGame,
+  createMockPlayers,
+} from '../../../models/create-mocks';
 
 describe('player commands', () => {
   describe('player votes', () => {
     describe('unvotes', () => {
       it('should handle unvotes on a particular player', () => {
-        const game = createGame();
-        game.players = createPlayers();
+        const game = createMockGame();
+        game.players = createMockPlayers();
         const { players } = game;
 
         handlePlayerCommand(`/${PlayerCommands.UNVOTE} 1`, '0', game);
@@ -25,8 +28,8 @@ describe('player commands', () => {
         expect(votedBy[0].slotNumber).toBe(2);
       });
       it('should handle multiple unvotes when there are no arguments', () => {
-        const game = createGame();
-        game.players = createPlayers();
+        const game = createMockGame();
+        game.players = createMockPlayers();
         const { players } = game;
 
         handlePlayerCommand(`/${PlayerCommands.UNVOTE}`, '0', game);
@@ -42,10 +45,10 @@ describe('player commands', () => {
     });
     describe('placing votes', () => {
       it('should not place the vote if the player has multiple votes but no votes left', () => {
-        const game = createGame();
-        game.players = createPlayers();
-        const expected = createGame();
-        expected.players = createPlayers();
+        const game = createMockGame();
+        game.players = createMockPlayers();
+        const expected = createMockGame();
+        expected.players = createMockPlayers();
 
         handlePlayerCommand(`/${PlayerCommands.VOTE} 3`, '0', game);
 
@@ -53,8 +56,8 @@ describe('player commands', () => {
       });
 
       it('should allow a player who is not voting to vote', () => {
-        const game = createGame();
-        const players = createPlayers();
+        const game = createMockGame();
+        const players = createMockPlayers();
         game.players = players;
         handlePlayerCommand(`/${PlayerCommands.VOTE} 3`, '4', game);
         const { votedBy } = players[3];

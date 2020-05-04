@@ -1,7 +1,5 @@
-import { IVote } from './../../models/data-types';
-import { hasUser } from './../helpers';
-import { ISlot, IGame } from '../../models/data-types';
-import { getUser } from '../helpers';
+import { IVote, ISlot, IGame } from '../../models/data-types';
+import { splitAndFormat, getUser } from '../../helpers';
 import { removeAllVotes } from './update-slot-common';
 
 export enum PlayerCommands {
@@ -28,10 +26,7 @@ export const handlePlayerCommand = (
   const player = getUser(rawName, players) as ISlot;
   if (!player) return null;
 
-  const commands = commandString
-    .split('/')
-    .map(c => c.trim())
-    .filter(c => !!c);
+  const commands = splitAndFormat(commandString, '/');
   while (commands.length > 0) {
     const args = commands
       .pop()

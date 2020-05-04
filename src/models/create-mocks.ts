@@ -1,25 +1,17 @@
-import {
-  IGame,
-  ISlot,
-  createDefaultGame,
-  createDefaultSlot,
-} from './data-types';
-export const createGame = (): IGame => ({
-  ...createDefaultGame('430', {
-    number: 56,
+import { IGame, ISlot, createGame, createSlot, GameType } from './data-types';
+export const createMockGame = (): IGame => ({
+  ...createGame('430', {
+    gameNumber: 56,
     title: 'jammies',
-    type: 'AFFM',
+    type: GameType.APRILFOOLS,
   }),
   hosts: [{ name: 'jimmy', hex: '#900' }],
-  players: [
-    createDefaultSlot({ name: 'jerry' }),
-    createDefaultSlot({ name: 'swords' }),
-  ],
+  players: [createSlot({ name: 'jerry' }), createSlot({ name: 'swords' })],
 });
 
-export const createPlayers = (): ISlot[] => {
+export const createMockPlayers = (): ISlot[] => {
   const players = [0, 1, 2].map(n =>
-    createDefaultSlot({
+    createSlot({
       name: `${n}`,
       slotNumber: n,
       voting: [
@@ -35,7 +27,7 @@ export const createPlayers = (): ISlot[] => {
     })
   );
   players.push(
-    createDefaultSlot({
+    createSlot({
       name: `3`,
       slotNumber: 3,
       voting: [{ slotNumber: 4, weight: 1 }],
@@ -43,7 +35,7 @@ export const createPlayers = (): ISlot[] => {
     })
   );
   players.push(
-    createDefaultSlot({
+    createSlot({
       name: `4`,
       slotNumber: 4,
       votedBy: [{ slotNumber: 3, weight: 1 }],
@@ -51,7 +43,7 @@ export const createPlayers = (): ISlot[] => {
     })
   );
   players.push(
-    createDefaultSlot({
+    createSlot({
       name: `5`,
       slotNumber: 5,
       voteWeight: 100,

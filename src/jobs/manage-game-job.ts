@@ -5,7 +5,7 @@ import IDataclient from '../models/IDataclient';
 import { IGame } from '../models/data-types';
 
 const manageGameHandler = async (
-  gameId: number,
+  gameId: string,
   dataclient: IDataclient = Dataclient
 ): Promise<void> => {
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
@@ -15,7 +15,7 @@ const manageGameHandler = async (
     loc: { page, post },
   } = game;
 
-  const baseUrl = `${process.env.FORUM_URL}/viewforum.php?f=${process.env.GAMES_ID}&t=${gameId}`;
+  const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
 
   let currentPage = page;
   let postsOnPage;
@@ -26,3 +26,5 @@ const manageGameHandler = async (
     currentPage++;
   } while (postsOnPage === postsPerPage);
 };
+
+export default manageGameHandler;
