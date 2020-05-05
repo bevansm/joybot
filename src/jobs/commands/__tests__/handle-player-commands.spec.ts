@@ -3,7 +3,6 @@ import {
   PlayerCommands,
 } from './../handle-player-command';
 
-import { IVote, ISlot } from '../../../models/data-types';
 import {
   createMockGame,
   createMockPlayers,
