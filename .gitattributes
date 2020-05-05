@@ -1,1 +1,2 @@
-res/*.html res/**/*.html linguist-vendored
+res/*.html linguist-vendored
+res/**/*.html linguist-vendored
