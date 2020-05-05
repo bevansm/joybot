@@ -11,19 +11,33 @@ JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
 3. Maintains "last read" posts and legacy votecounts in a CouchBase DB
 4. Resets vote counts if commanded by a host
 
-## Completed features
+## Worklist
 
-- [x] Basic cron job management
+# Post Parsing
+
 - [x] Host command parsing
-- [ ] Checking if host actions cause player death
 - [x] Player command parsing
 - [x] Automatic playerlist generation
+- [x] Checking if host actions cause player death
+- [x] Parsing posts from active games
+- [x] Vote inference
+- [x] Host color inference
+
+# Infastructure
+
+- [x] Basic cron job management
 - [x] Monitoring active games
 - [x] Automatic job generation
-- [ ] Parsing posts from active games
-- [ ] PM Support
-- [ ] Bot posting
 - [ ] Database
+- [ ] Post Support
+- [ ] PM Support
+- [ ] API Implementation
+
+# Automation
+
+- [ ] Automated deploy with docker
+- [ ] Automated deploy on AWS EC2/GCP
+- [x] Node logging library
 
 ## Use
 
@@ -35,8 +49,6 @@ JoyBot looks for bolded `/***` commands from players. Currently, only votes are 
 - `/unvote` will remove all of your votes. `/unvote {playername}` will remove your vote on a player, if you have one.
 
 If you are only able to vote one player, joybot will automatically change your vote upon a `/vote` command. If you may vote multiple players, JoyBot will only register a vote if you have a vote that you have not placed on a player.
-
-JoyBot will always support you voting the hosts. Including JoyBot. :)
 
 JoyBot will try to parse nicknames/shortened versions of player names, but if there are multiple players with similar names or mispellings, JoyBot might not correctly count your vote.
 
@@ -55,7 +67,10 @@ To start JoyBot, include the line
 - `--add-host {name} {color}`: Adds a host to the host list. Host color is optional, but must be in the form of `#xxx` or `#xxxxxx` to register. joybot will always be considered a host.
 - `--remove-hosts {name} {name}`: Removes host(s) from the hosts list.
 - `--set-host-color {name} {color}`: Sets the mod color of the give host.
-- `--create-playerlist`: Tries to parse the post with the config for a "Playerlist" as shown in the OP of [VFM68](https://www.blankmediagames.com/phpbb/viewtopic.php?f=17&t=108218#p3434679). Expects that playernames are one word and that the playerlist is inside an ordered list, i.e. numbered.
+- `--create-playerlist`: Tries to parse the post with the config for a "Playerlist" as shown in the OP of [VFM68](https://www.blankmediagames.com/phpbb/viewtopic.php?f=17&t=108218#p3434679).
+  - The list header (i.e. "Playerlist", "Players") must be bolded/underlined
+  - The playerlist must be a bbcode `[list]` or `[list=]` element
+  - Expects that playernames are one word and that the playerlist is inside an ordered list, i.e. numbered.
   - If successfully called twice, it will wipe the old playerlist and replace it with a new one.
 - `--add-players {player 1} {player 2}`: Adds a player(s) to the live playerlist.
 - `--kill-players {player 1} {player 2}`: Removes a player(s) from the live playerlist and sets their vote weight to 0. Note that you can give dead players votes!
@@ -90,3 +105,7 @@ JoyBot expects PMS with:
 
 1. Fill out the `.env` file.
 2. `docker-compose up`.
+
+# TIL
+
+Lots of spaghetti code with this one--everything from mutating state to swapping between regex and javascript string parsing to weird naming conventions. Mostly wrote this 'for fun' to kill some time during quarentine, work with Jest, and reminsce about BLFM.

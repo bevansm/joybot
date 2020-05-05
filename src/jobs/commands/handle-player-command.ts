@@ -1,5 +1,7 @@
+import { isAtMajority, sumVotes, inferUser } from './../../utils/user-utils';
 import { IVote, ISlot, IGame } from '../../models/data-types';
-import { splitAndFormat, getUser } from '../../helpers';
+import { splitAndFormat } from '../../utils/format-utils';
+import { getUser } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
 
 export enum PlayerCommands {
@@ -9,13 +11,13 @@ export enum PlayerCommands {
 
 /**
  * @param command - a command in the form /abcdef
- * @param rawName - the name of the player who made the command
+ * @param playerName - the name of the player who made the command
  * @param game
  * @returns the lynched player if the game reached majority, null otherwise
  */
 export const handlePlayerCommand = (
   commandString: string,
-  rawName: string,
+  playerName: string,
   game: IGame
 ): ISlot => {
   const {
@@ -23,7 +25,7 @@ export const handlePlayerCommand = (
     config: { majority },
   } = game;
 
-  const player = getUser(rawName, players) as ISlot;
+  const player = getUser(playerName, players) as ISlot;
   if (!player) return null;
 
   const commands = splitAndFormat(commandString, '/');
@@ -32,7 +34,7 @@ export const handlePlayerCommand = (
       .pop()
       .split(' ')
       .map(c => c.trim());
-    const target = getUser(args[1] || '', players) as ISlot;
+    const target = inferUser(args[1] || '', players) as ISlot;
 
     const {
       voting: playerVoting,
@@ -84,7 +86,7 @@ export const handlePlayerCommand = (
           };
           player.voting = [playerVote];
         }
-        if (isLynched(target, majority)) return target;
+        if (isAtMajority(target, majority)) return target;
         break;
       default:
         break;
@@ -98,10 +100,4 @@ export const removeVote = (slotNumber: number, votes: IVote[]): IVote[] =>
 
 const addVote = (vote: IVote, votes: IVote[]): IVote[] => [...votes, vote];
 
-const sumVotes = (votes: IVote[]): number =>
-  votes.reduce((acc, v) => acc + v.weight, 0);
-
-const isLynched = (player: ISlot, majority: number): boolean => {
-  const { votedBy, extraVotesToLynch } = player;
-  return sumVotes(votedBy) - extraVotesToLynch >= majority;
-};
+export default handlePlayerCommand;

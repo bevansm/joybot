@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { numOrUndefined } from '../helpers';
+import { numOrUndefined } from '../utils/format-utils';
 
 export interface IVote {
   slotNumber: number;
@@ -29,6 +29,7 @@ export interface IConfig {
   interval: number;
   autolock: boolean;
   majority: number;
+  enabled: boolean;
 }
 
 export enum GameType {
@@ -53,30 +54,21 @@ export interface IGameInfo {
   letter?: string;
 }
 
-export interface IThreadLocation {
-  page: number;
-  post: string;
-}
-
 interface IGameMain {
   config: IConfig;
   id: string;
   hosts: IHost[];
   players: ISlot[];
-  loc?: IThreadLocation;
+  lastPost: string;
 }
 
 export type IGame = IGameMain & Partial<IGameInfo>;
-
-export const DefaultLocation: IThreadLocation = {
-  page: 0,
-  post: '',
-};
 
 export const DefaultConfig: IConfig = {
   interval: numOrUndefined(process.env.DEFAULT_VOTECOUNT_TIMEOUT) || 60,
   autolock: false,
   majority: 1,
+  enabled: true,
 };
 
 const DefaultSlot: ISlot = {
@@ -101,9 +93,9 @@ export const createGame = (id: string, info: IGameInfo): IGame =>
       hosts: [],
       players: [],
       config: { ...DefaultConfig },
-      loc: { ...DefaultLocation },
+      lastPost: '0',
     },
-    { info }
+    { ...info }
   );
 
 export const createInfo = (config?: Partial<IGameInfo>): IGameInfo =>

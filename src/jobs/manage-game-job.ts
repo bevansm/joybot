@@ -1,30 +1,166 @@
+import { isAtMajority } from './../utils/user-utils';
+import { isUndefined } from 'lodash';
 import axios from 'axios';
+import cheerio from 'cheerio';
 
-import Dataclient from '../models/Dataclient';
-import IDataclient from '../models/IDataclient';
-import { IGame } from '../models/data-types';
+import { ISlot, IGame, IHost } from '../models/data-types';
+import IDataclient from '../models/dataclient/IDataclient';
+import Dataclient from '../models/dataclient/Dataclient';
+import IPoster from '../models/poster/IPoster';
+import Poster from '../models/poster/Poster';
+import Manager from './live-game-jobs-manager';
 
-const manageGameHandler = async (
+import handlePlayerCommand from './commands/handle-player-command';
+import handleHostCommand, { addHost } from './commands/handle-host-command';
+
+import { hasUser, getUser } from '../utils/user-utils';
+import { parseHex } from './parsers/parse-hex';
+
+const manageGameJob = async (
   gameId: string,
-  dataclient: IDataclient = Dataclient
+  dataclient: IDataclient = Dataclient,
+  poster: IPoster = Poster
 ): Promise<void> => {
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
-
   const game: IGame = await dataclient.getGame(gameId);
-  const {
-    loc: { page, post },
-  } = game;
+  const { lastPost, config } = game;
 
   const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
 
-  let currentPage = page;
-  let postsOnPage;
-  let lastPost;
+  let queryString = `&p=${lastPost}`;
+  let getNextPage: boolean = true;
+  let lynchedPlayer: ISlot;
+  let shouldPrint;
+  let pCurrentPost: string = `p${lastPost}`;
 
-  do {
-    await axios.get(`${baseUrl}&start=${currentPage * postsPerPage}`);
-    currentPage++;
-  } while (postsOnPage === postsPerPage);
+  while (getNextPage) {
+    const $ = await axios
+      .get(`${baseUrl}${queryString}`)
+      .then(res => cheerio.load(res.data));
+    const page = Number($('div.pagination span strong').text());
+    const posts = $('div.post').toArray();
+
+    for (const post of posts) {
+      const id = $(post).attr('id');
+      if (id <= lastPost) continue;
+      pCurrentPost = id;
+
+      const allowPlayerPosts = !lynchedPlayer && config.enabled;
+      const { lynched, print } = handlePost(game, post, $, allowPlayerPosts);
+
+      if (!lynchedPlayer) lynchedPlayer = lynched;
+      if (!isUndefined(print)) shouldPrint = print;
+    }
+    queryString = `&start=${(page + 1) * postsPerPage}`;
+    getNextPage = posts.length === postsPerPage;
+  }
+
+  await poster.post(game, {
+    votecount: true,
+    gameInfo: shouldPrint,
+    lynch: lynchedPlayer,
+  });
+  if (lynchedPlayer) Manager.stopJob(gameId);
+
+  await dataclient.updateGame({ ...game, lastPost: pCurrentPost.substring(1) });
 };
 
-export default manageGameHandler;
+interface PostHandlerReply {
+  lynched?: ISlot;
+  print?: boolean;
+}
+
+const handlePost = (
+  game: IGame,
+  post: CheerioElement,
+  $: CheerioStatic,
+  allowPlayers: boolean = false
+): PostHandlerReply => {
+  const { hosts } = game;
+  const username = $(post)
+    .find('dl.postprofile a[href*="viewprofile"]')
+    .attr('href')
+    .split('=')
+    .pop();
+
+  const content = $(post).find('div.content').filter(':not(blockquote)')[0];
+  if (hasUser(username, hosts) || hosts.length === 0)
+    return handleHostPost(username, game, content, $);
+  else if (allowPlayers) return handleUserPost(username, game, content, $);
+  else return {};
+};
+
+const handleHostPost = (
+  name: string,
+  game: IGame,
+  content: CheerioElement,
+  $: CheerioStatic
+): PostHandlerReply => {
+  const startCommand = process.env.START_COMMAND.toUpperCase();
+  const { hosts } = game;
+
+  const text = $(content)
+    .text()
+    .split('\n')
+    .map(l => l.trim());
+
+  let print;
+  let lynched;
+
+  for (const line of text) {
+    if (line.toUpperCase().indexOf(startCommand) === 0) {
+      if (hosts.length === 0) addHost(name, '#000', hosts);
+      const res = handleHostCommand(game, line, $, content);
+      if (!isUndefined(res)) print = res;
+    }
+  }
+
+  const host = getUser(name, hosts) as IHost;
+  const { hex } = host;
+  if (hex === '#000') host.hex = parseHex(content, $) || '#000';
+
+  const {
+    players,
+    config: { majority },
+  } = game;
+
+  for (const player of players) {
+    if (isAtMajority(player, majority)) {
+      lynched = player;
+      break;
+    }
+  }
+
+  return { print, lynched };
+};
+
+const handleUserPost = (
+  name: string,
+  game: IGame,
+  content: CheerioElement,
+  $: CheerioStatic
+): PostHandlerReply => {
+  const { players } = game;
+  const player = getUser(name, players) as ISlot;
+  if (player && player.isAlive) {
+    const bolded = $(content)
+      .find('span[style*="font-weight: bold"]')
+      .toArray();
+    const votes: string[] = bolded.reduce((arr, e) => {
+      const text = $(e).text();
+      const index = text.indexOf('/');
+      if (index > -1) arr.push(text.substring(index));
+      return arr;
+    }, []);
+
+    for (const vote of votes) {
+      const res = handlePlayerCommand(vote, name, game);
+      if (res) {
+        return { lynched: res };
+      }
+    }
+  }
+  return {};
+};
+
+export default manageGameJob;

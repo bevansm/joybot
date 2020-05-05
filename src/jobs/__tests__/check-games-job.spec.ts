@@ -7,7 +7,7 @@ import { getActiveGames } from '../check-games-job';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('game management tests', () => {
+describe('game checking test', () => {
   let oldEnvValue: string;
   beforeAll(() => {
     oldEnvValue = process.env.POSTS_PER_PAGE;

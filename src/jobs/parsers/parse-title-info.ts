@@ -1,6 +1,10 @@
 import { roman } from 'romanjs';
-import { numeralOrUndefined } from './../../helpers';
-import { splitAndFormat, numOrUndefined, isEqual } from '../../helpers';
+import { numeralOrUndefined } from '../../utils/format-utils';
+import {
+  splitAndFormat,
+  numOrUndefined,
+  isEqual,
+} from '../../utils/format-utils';
 import { IGameInfo, GameType, createInfo } from '../../models/data-types';
 import logger, { Level } from '../../logger/Logger';
 import { isUndefined } from 'lodash';
@@ -32,15 +36,25 @@ export const parseGameInfo = (rawInfo: string): IGameInfo => {
     }
   }
 
-  if (!type || !gameNumber || !title)
-    logger.log(Level.ERROR, `failed to completely parse a info for a game`, {
+  const config: Partial<IGameInfo> = {
+    type: type as GameType,
+    title,
+    gameNumber,
+    letter,
+  };
+  if (!type || !gameNumber || !title) {
+    logger.log(Level.ERROR, `failed to parse game info`, {
       rawInfo,
-      title,
-      gameNumber,
-      type,
+      ...config,
     });
+  } else {
+    logger.log(Level.DEBUG, `created info for ${gameNumber}`, {
+      ...config,
+      rawInfo,
+    });
+  }
 
-  return createInfo({ type: type as GameType, title, gameNumber, letter });
+  return createInfo(config);
 };
 
 /**

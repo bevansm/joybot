@@ -1,9 +1,9 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { IGame, createGame } from './../models/data-types';
-import Dataclient from '../models/Dataclient';
-import IDataclient from '../models/IDataclient';
+import { IGame, createGame } from '../models/data-types';
+import Dataclient from '../models/dataclient/Dataclient';
+import IDataclient from '../models/dataclient/IDataclient';
 import logger, { Level } from '../logger/Logger';
 import Manager from './live-game-jobs-manager';
 import manageGameHandler from './manage-game-job';
@@ -14,8 +14,10 @@ export const startGameJob = async (
   gameId: string,
   dataclient: IDataclient = Dataclient
 ): Promise<void> => {
+  if (Manager.getJobs().includes(gameId)) return;
+
   let game = await dataclient.getGame(gameId);
-  if (!game) game = await initGame(gameId);
+  if (!game) game = await initGame(gameId, dataclient);
   if (!game) {
     logger.log(Level.ERROR, `unable to start a cronjob for ${gameId}`, {
       id: gameId,
@@ -40,14 +42,24 @@ export const initGame = async (
   const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
   try {
     const $ = await axios.get(baseUrl).then(res => cheerio.load(res.data));
+    logger.log(Level.DEBUG, `firt time loading the page for ${gameId}`, {
+      baseUrl,
+      gameId,
+    });
     const title = $(`a[href="./viewtopic.php?f=17&t=${gameId}"]`).text();
+    logger.log(Level.DEBUG, `successfully found title for ${gameId}`, {
+      baseUrl,
+      gameId,
+      title,
+    });
     const game = createGame(gameId, parseGameInfo(title));
     await dataclient.updateGame(game);
     return game;
   } catch (e) {
     logger.log(
       Level.ERROR,
-      `unable to create a game entry for ${gameId}: ${e.message}`
+      `unable to create a game entry for ${gameId}: ${e.message}`,
+      { error: e, gameId }
     );
     return null;
   }

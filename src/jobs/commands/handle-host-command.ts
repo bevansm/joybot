@@ -1,4 +1,4 @@
-import { merge, isUndefined } from 'lodash';
+import { merge, isUndefined, isInteger } from 'lodash';
 
 import {
   IHost,
@@ -14,9 +14,8 @@ import {
   isEqual,
   numOrUndefined,
   boolOrUndefined,
-  hasUser,
-  getUser,
-} from '../../helpers';
+} from '../../utils/format-utils';
+import { hasUser, getUser, findMaj } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
 
 export enum HostCommands {
@@ -43,17 +42,20 @@ export enum HostCommands {
  * @param $
  * @param postContent
  */
-export const applyHostCommand = (
+export const handleHostCommand = (
   game: IGame,
   commandString: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
-): boolean => {
-  const startCommand = process.env.START_COMMAND;
+): boolean | undefined => {
+  const startCommand = process.env.START_COMMAND.toUpperCase();
   return commandString
-    .substring(commandString.indexOf(startCommand) + 1)
+    .substring(commandString.toUpperCase().indexOf(startCommand) + 1)
     .split('--')
-    .reduce((a, c) => a && applyCommand(game, c.trim(), $, postContent), false);
+    .reduce<undefined | boolean>((a, c) => {
+      const res = applyCommand(game, c.trim(), $, postContent);
+      return isUndefined(res) ? a : a && res;
+    }, undefined);
 };
 
 /**
@@ -63,14 +65,14 @@ export const applyHostCommand = (
  * @param command
  * @param $
  * @param postContent
- * @returns the slot that would be lynched, if any
+ * @returns if the command should trigger a print.
  */
 export const applyCommand = (
   game: IGame,
   command: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
-): boolean => {
+): boolean | undefined => {
   const args = command.split(' ').map(c => c.trim());
   const numArg1 = numOrUndefined(args[1]);
   const numArg2 = numOrUndefined(args[2]);
@@ -86,6 +88,7 @@ export const applyCommand = (
         p.votedBy = [];
         p.voting = [];
       });
+      updateConfig(config, { majority: findMaj(players) });
       break;
     case HostCommands.HOST_ADD:
       addHost(args[1], args[2], hosts);
@@ -98,6 +101,7 @@ export const applyCommand = (
       break;
     case HostCommands.PLAYERLIST:
       createPlayerlist(game, $, postContent);
+      updateConfig(config, { majority: findMaj(players) });
       break;
     case HostCommands.PLAYER_ADD:
       args.slice(1).map(p => addPlayer(p, players));
@@ -126,10 +130,14 @@ export const applyCommand = (
     default:
     // Do nothing
   }
-  return false;
+  return undefined;
 };
 
-const addHost = (name: string, hex: string = '', hosts: IHost[]): void => {
+export const addHost = (
+  name: string,
+  hex: string = '',
+  hosts: IHost[]
+): void => {
   if (!name || hasUser(name, hosts)) return;
   if (isValidHex(hex)) hosts.push({ name, hex });
   else hosts.push({ name, hex: '#000' });
@@ -228,3 +236,5 @@ const createPlayerlist = (
   const playerlist = createPlayerlistHelper($, postContent);
   if (playerlist.length > 0) game.players = playerlist;
 };
+
+export default handleHostCommand;

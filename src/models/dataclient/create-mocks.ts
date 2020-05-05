@@ -1,4 +1,4 @@
-import { IGame, ISlot, createGame, createSlot, GameType } from './data-types';
+import { IGame, ISlot, createGame, createSlot, GameType } from '../data-types';
 export const createMockGame = (): IGame => ({
   ...createGame('430', {
     gameNumber: 56,

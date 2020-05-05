@@ -1,5 +1,4 @@
 import romanize from 'romanjs';
-import { INamed } from './models/data-types';
 
 export const isValidHex = (hex: string): boolean =>
   RegExp(`^#(?:[0-9a-fA-F]{3}){1,2}$`).test(hex);
@@ -33,9 +32,3 @@ export const splitAndFormat = (str: string, delim: string): string[] =>
     .split(delim)
     .map(s => s.trim())
     .filter(Boolean);
-
-export const hasUser = (user: string, users: INamed[]): boolean =>
-  !users.every(u => !isEqual(user, u.name));
-
-export const getUser = (user: string, users: INamed[]): INamed =>
-  users.find(u => isEqual(user, u.name));

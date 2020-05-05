@@ -3,11 +3,11 @@ import {
   PlayerCommands,
 } from './../handle-player-command';
 
-import { IVote, ISlot } from './../../../models/data-types';
+import { IVote, ISlot } from '../../../models/data-types';
 import {
   createMockGame,
   createMockPlayers,
-} from '../../../models/create-mocks';
+} from '../../../models/dataclient/create-mocks';
 
 describe('player commands', () => {
   describe('player votes', () => {

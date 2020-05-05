@@ -5,6 +5,7 @@
     "ordered-imports": false,
     "curly": [false, "same-line-single-line"],
     "strict-type-predicates": true,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "interface-name": false
   }
 }

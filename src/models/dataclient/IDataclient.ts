@@ -1,4 +1,4 @@
-import { IGame } from './data-types';
+import { IGame } from '../data-types';
 
 interface IDataclient {
   getGame: (game: string) => Promise<IGame>;

@@ -1,6 +1,6 @@
 import { applyCommand, HostCommands } from '../handle-host-command';
 import { createSlot } from '../../../models/data-types';
-import { createMockGame } from '../../../models/create-mocks';
+import { createMockGame } from '../../../models/dataclient/create-mocks';
 
 describe('command parsing tests', () => {
   let oldCommand: string;

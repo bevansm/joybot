@@ -12,7 +12,12 @@ const Logger = {
       ...info,
       timestamp: new Date().toISOString(),
     };
-    console.log(JSON.stringify(log));
+    if (process.env.NODE_ENV === 'production' && level !== Level.ERROR) {
+      // TODO: Do prod logging
+      console.log(JSON.stringify(log));
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.log(JSON.stringify(log));
+    }
   },
 };
 
