@@ -17,6 +17,7 @@ import {
 } from '../../utils/format-utils';
 import { hasUser, getUser, findMaj } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
+import { compareTwoStrings } from 'string-similarity';
 
 export enum HostCommands {
   PRINT = 'print',
@@ -54,7 +55,7 @@ export const handleHostCommand = (
     .split('--')
     .reduce<undefined | boolean>((a, c) => {
       const res = applyCommand(game, c.trim(), $, postContent);
-      return isUndefined(res) ? a : a && res;
+      return isUndefined(res) ? a : res;
     }, undefined);
 };
 
@@ -101,7 +102,7 @@ export const applyCommand = (
       break;
     case HostCommands.PLAYERLIST:
       createPlayerlist(game, $, postContent);
-      updateConfig(config, { majority: findMaj(players) });
+      updateConfig(config, { majority: findMaj(game.players) });
       break;
     case HostCommands.PLAYER_ADD:
       args.slice(1).map(p => addPlayer(p, players));

@@ -1,7 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NODE_ENV: 'development' | 'production';
+      NODE_ENV: 'dev' | 'prod';
       FORUM_URL: string;
       GAMES_ID: string;
 

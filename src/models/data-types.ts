@@ -76,7 +76,7 @@ const DefaultSlot: ISlot = {
   isAlive: true,
   slotNumber: -1,
   voteWeight: 1,
-  extraVotesToLynch: 1,
+  extraVotesToLynch: 0,
   canSplitVote: false,
   history: null,
   voting: null,

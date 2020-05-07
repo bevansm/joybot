@@ -55,8 +55,10 @@ export const handlePlayerCommand = (
     switch (args[0].toLowerCase()) {
       case PlayerCommands.UNVOTE:
         if (args[1] && target) {
-          target.votedBy = removeVote(playerSlot, targetVotedBy);
-          player.voting = removeVote(targetSlot, playerVoting);
+          if (target.isAlive) {
+            target.votedBy = removeVote(playerSlot, targetVotedBy);
+            player.voting = removeVote(targetSlot, playerVoting);
+          }
         } else {
           removeAllVotes(player, players);
         }

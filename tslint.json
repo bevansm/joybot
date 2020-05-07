@@ -6,6 +6,7 @@
     "curly": [false, "same-line-single-line"],
     "strict-type-predicates": true,
     "object-literal-sort-keys": false,
-    "interface-name": false
+    "interface-name": false,
+    "no-shadowed-variable": false
   }
 }

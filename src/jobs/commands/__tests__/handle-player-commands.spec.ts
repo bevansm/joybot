@@ -16,10 +16,15 @@ describe('player commands', () => {
         game.players = createMockPlayers();
         const { players } = game;
 
-        handlePlayerCommand(`/${PlayerCommands.UNVOTE} 1`, '0', game);
+        const lynched = handlePlayerCommand(
+          `/${PlayerCommands.UNVOTE} 1`,
+          '0',
+          game
+        );
         const { voting } = players[0];
         const { votedBy } = players[1];
 
+        expect(lynched).toBeNull();
         expect(voting.length).toBe(1);
         expect(votedBy.length).toBe(1);
 
@@ -31,12 +36,17 @@ describe('player commands', () => {
         game.players = createMockPlayers();
         const { players } = game;
 
-        handlePlayerCommand(`/${PlayerCommands.UNVOTE}`, '0', game);
+        const lynched = handlePlayerCommand(
+          `/${PlayerCommands.UNVOTE}`,
+          '0',
+          game
+        );
 
         const { voting } = players[0];
         const { votedBy: vb1 } = players[1];
         const { votedBy: vb2 } = players[2];
 
+        expect(lynched).toBeNull();
         expect(voting.length).toBe(0);
         expect(vb1.length).toBe(1);
         expect(vb2.length).toBe(1);

@@ -15,6 +15,7 @@ import handleHostCommand, { addHost } from './commands/handle-host-command';
 
 import { hasUser, getUser } from '../utils/user-utils';
 import { parseHex } from './parsers/parse-hex';
+import logger, { Level } from '../logger/Logger';
 
 const manageGameJob = async (
   gameId: string,
@@ -47,7 +48,6 @@ const manageGameJob = async (
 
       const allowPlayerPosts = !lynchedPlayer && config.enabled;
       const { lynched, print } = handlePost(game, post, $, allowPlayerPosts);
-
       if (!lynchedPlayer) lynchedPlayer = lynched;
       if (!isUndefined(print)) shouldPrint = print;
     }
@@ -83,7 +83,8 @@ const handlePost = (
     .split('=')
     .pop();
 
-  const content = $(post).find('div.content').filter(':not(blockquote)')[0];
+  const content = $(post).find('div.content')[0];
+  $(content).find('blockquote').remove();
   if (hasUser(username, hosts) || hosts.length === 0)
     return handleHostPost(username, game, content, $);
   else if (allowPlayers) return handleUserPost(username, game, content, $);
@@ -105,7 +106,6 @@ const handleHostPost = (
     .map(l => l.trim());
 
   let print;
-  let lynched;
 
   for (const line of text) {
     if (line.toUpperCase().indexOf(startCommand) === 0) {
@@ -116,14 +116,23 @@ const handleHostPost = (
   }
 
   const host = getUser(name, hosts) as IHost;
-  const { hex } = host;
-  if (hex === '#000') host.hex = parseHex(content, $) || '#000';
+  if (host) {
+    const { hex } = host;
+    if (hex === '#000') host.hex = parseHex(content, $) || '#000';
+  } else {
+    logger.log(Level.ERROR, "expected a host but didn't find one", {
+      name,
+      gameId: game.id,
+      lines: text.length,
+    });
+  }
 
   const {
     players,
     config: { majority },
   } = game;
 
+  let lynched;
   for (const player of players) {
     if (isAtMajority(player, majority)) {
       lynched = player;

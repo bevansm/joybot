@@ -20,6 +20,8 @@ describe('integration tests', () => {
   let oldCommandValue: string;
 
   beforeAll(() => {
+    process.env.NODE_ENV = 'prod';
+
     oldPostsPerValue = process.env.POSTS_PER_PAGE;
     process.env.POSTS_PER_PAGE = '25';
 
@@ -54,12 +56,26 @@ describe('integration tests', () => {
       .mockImplementationOnce(async () => {
         game = await MockDataclient.getGame(gameId);
         writeGame(game, 2);
+        const { players } = game;
+        players.forEach(({ votedBy }, i) =>
+          expect(votedBy.length).toBe(i === 3 ? 1 : 0)
+        );
+        players.forEach(({ voting }, i) =>
+          expect(voting.length).toBe(i === 5 ? 1 : 0)
+        );
         return { data: pages[1] };
       })
       // Start of p3
       .mockImplementationOnce(async () => {
         game = await MockDataclient.getGame(gameId);
         writeGame(game, 3);
+        const { players } = game;
+        players.forEach(({ votedBy }, i) =>
+          expect(votedBy.length).toBe([3, 8].includes(i) ? 1 : 0)
+        );
+        players.forEach(({ voting }, i) =>
+          expect(voting.length).toBe([5, 1].includes(i) ? 1 : 0)
+        );
         return { data: pages[2] };
       });
 
@@ -90,18 +106,23 @@ describe('integration tests', () => {
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(4);
     expect(mockPosterPost).toHaveBeenCalledTimes(1);
-    expect(mockStopJob).toHaveBeenCalledTimes(1);
-    expect(mockStopJob).toHaveBeenCalledWith(gameId);
+    const { lynch, gameInfo } = mockPosterPost.mock.calls[0][1];
 
-    const { players, hosts } = game;
+    expect(!!lynch).toBe(false);
+    expect(gameInfo).toBe(true);
+
+    expect(mockStopJob).toHaveBeenCalledTimes(0);
+
+    game = await MockDataclient.getGame(gameId);
+    writeGame(game, 4);
+    const { players, hosts, lastPost } = game;
+    expect(lastPost).toBe('3436440');
     expect(hosts.length).toBe(2);
     players.forEach(({ votedBy }, i) =>
-      i === 3
-        ? expect(sumVotes(votedBy)).toBe(2)
-        : expect(votedBy.length).toBe(0)
+      expect(votedBy.length).toBe(i === 8 ? 2 : 0)
     );
     players.forEach(({ voting }, i) =>
-      expect(voting.length).toBe(i === 0 || i === 5 ? 1 : 0)
+      expect(voting.length).toBe([1, 0].includes(i) ? 1 : 0)
     );
   });
 });
