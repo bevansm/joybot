@@ -50,6 +50,7 @@
       "<rootDir>/src",
       "<rootDir>/src/jobs",
       "<rootDir>/src/jobs/commands",
+      "<rootDir>/src/phpbb-api",
       "<rootDir>/src/utils"
     ],
     "preset": "ts-jest",
@@ -69,6 +70,9 @@
       "jsx",
       "json",
       "node"
+    ],
+    "setupFiles": [
+      "dotenv/config"
     ]
   }
 }

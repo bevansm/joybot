@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import { IGame } from '../../models/data-types';
 import MockDataclient from '../../models/dataclient/MockDataclient';
-import MockPoster from '../../models/poster/MockPoster';
+import MockPHPBBApi from '../../phpbb-api/MockPHPBBApi';
 import Manager from '../../jobs/live-game-jobs-manager';
 
 import manageGameJob from '../manage-game-job';
@@ -79,7 +79,7 @@ describe('integration tests', () => {
         return { data: pages[2] };
       });
 
-    const mockPosterPost = jest.spyOn(MockPoster, 'post');
+    const mockPosterPost = jest.spyOn(MockPHPBBApi, 'post');
     const mockCreateJob = jest
       .spyOn(Manager, 'createJob')
       .mockImplementation(lodash.noop);
@@ -102,7 +102,7 @@ describe('integration tests', () => {
     expect(game).toBeDefined();
     expect(game.title).toBe('Twitch Chat FM');
 
-    await manageGameJob(gameId, MockDataclient, MockPoster);
+    await manageGameJob(gameId, MockDataclient, MockPHPBBApi);
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(4);
     expect(mockPosterPost).toHaveBeenCalledTimes(1);

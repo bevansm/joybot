@@ -6,8 +6,8 @@ import cheerio from 'cheerio';
 import { ISlot, IGame, IHost } from '../models/data-types';
 import IDataclient from '../models/dataclient/IDataclient';
 import Dataclient from '../models/dataclient/Dataclient';
-import IPoster from '../models/poster/IPoster';
-import Poster from '../models/poster/Poster';
+import IPHPBBApi from '../phpbb-api/IPHBBApi';
+import PHPBAPI from '../phpbb-api/PHPBBApi';
 import Manager from './live-game-jobs-manager';
 
 import handlePlayerCommand from './commands/handle-player-command';
@@ -20,7 +20,7 @@ import logger, { Level } from '../logger/Logger';
 const manageGameJob = async (
   gameId: string,
   dataclient: IDataclient = Dataclient,
-  poster: IPoster = Poster
+  poster: IPHPBBApi = PHPBAPI
 ): Promise<void> => {
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
   const game: IGame = await dataclient.getGame(gameId);
@@ -38,6 +38,10 @@ const manageGameJob = async (
     const $ = await axios
       .get(`${baseUrl}${queryString}`)
       .then(res => cheerio.load(res.data));
+
+    // Kill all quoted posts
+    $('blockquote').remove();
+
     const page = Number($('div.pagination span strong').text());
     const posts = $('div.post').toArray();
 
@@ -84,7 +88,6 @@ const handlePost = (
     .pop();
 
   const content = $(post).find('div.content')[0];
-  $(content).find('blockquote').remove();
   if (hasUser(username, hosts) || hosts.length === 0)
     return handleHostPost(username, game, content, $);
   else if (allowPlayers) return handleUserPost(username, game, content, $);
@@ -149,6 +152,9 @@ const handleUserPost = (
   content: CheerioElement,
   $: CheerioStatic
 ): PostHandlerReply => {
+  // if we have a user, ignore spoilers
+  $(content).find('.quotecontent').remove();
+
   const { players } = game;
   const player = getUser(name, players) as ISlot;
   if (player && player.isAlive) {

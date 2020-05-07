@@ -1,5 +1,4 @@
-import { ISlot } from './../data-types';
-import { IGame } from '../data-types';
+import { ISlot, IGame } from '../models/data-types';
 
 export interface IPostOptions {
   votecount?: boolean;
@@ -7,8 +6,8 @@ export interface IPostOptions {
   lynch?: ISlot;
 }
 
-interface IPoster {
+interface IPHPBBApi {
   post: (game: IGame, options: IPostOptions) => Promise<void>;
 }
 
-export default IPoster;
+export default IPHPBBApi;
