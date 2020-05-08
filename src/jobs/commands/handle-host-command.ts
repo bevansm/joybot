@@ -6,7 +6,7 @@ import {
   IGame,
   createSlot,
   IConfig,
-} from '../../models/data-types';
+} from '../../dataclient/data-types';
 
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import {

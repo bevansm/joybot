@@ -105,6 +105,17 @@ JoyBot expects PMS with:
 
 1. Fill out the `.env` file.
 2. `docker-compose up`.
+3. Provide a captcha.
+
+### Captcha
+
+During setup, you will be prompted for a captcha token. To obtain:
+
+1. Navigate to the signin page
+2. Complete the captcha. Do not log in.
+3. Press f12 to open devtools and open the console tab.
+4. Type 'grecaptcha.getResponse()'
+5. Paste the result into your terminal
 
 # TIL
 

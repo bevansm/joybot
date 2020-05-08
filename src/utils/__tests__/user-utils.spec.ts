@@ -1,5 +1,5 @@
 import { isAtMajority } from '../user-utils';
-import { createSlot, IVote } from '../../models/data-types';
+import { createSlot, IVote } from '../../dataclient/data-types';
 
 describe('user utils tests', () => {
   describe('maj tests', () => {

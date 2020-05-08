@@ -1,5 +1,5 @@
 import { isAtMajority, sumVotes, inferUser } from './../../utils/user-utils';
-import { IVote, ISlot, IGame } from '../../models/data-types';
+import { IVote, ISlot, IGame } from '../../dataclient/data-types';
 import { splitAndFormat } from '../../utils/format-utils';
 import { getUser } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';

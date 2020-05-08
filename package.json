@@ -18,15 +18,18 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
+    "axios-cookiejar-support": "^1.0.0",
     "cheerio": "^1.0.0-rc.3",
     "couchbase": "^3.0.1",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "form-data": "^3.0.0",
     "fs": "0.0.1-security",
     "lodash": "^4.17.15",
     "romanjs": "^2.0.1",
-    "string-similarity": "^4.0.1"
+    "string-similarity": "^4.0.1",
+    "tough-cookie": "^4.0.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.18",
@@ -37,6 +40,7 @@
     "@types/lodash": "^4.14.150",
     "@types/node": "^13.13.4",
     "@types/string-similarity": "^3.0.0",
+    "@types/tough-cookie": "^4.0.0",
     "jest": "^25.5.4",
     "ts-jest": "^25.4.0",
     "ts-node": "^8.9.1",

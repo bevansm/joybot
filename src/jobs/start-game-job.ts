@@ -1,9 +1,9 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { IGame, createGame } from '../models/data-types';
-import Dataclient from '../models/dataclient/Dataclient';
-import IDataclient from '../models/dataclient/IDataclient';
+import { IGame, createGame } from '../dataclient/data-types';
+import Dataclient from '../dataclient/Dataclient';
+import IDataclient from '../dataclient/IDataclient';
 import logger, { Level } from '../logger/Logger';
 import Manager from './live-game-jobs-manager';
 import manageGameHandler from './manage-game-job';

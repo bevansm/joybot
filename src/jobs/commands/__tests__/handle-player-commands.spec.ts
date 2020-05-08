@@ -6,7 +6,7 @@ import {
 import {
   createMockGame,
   createMockPlayers,
-} from '../../../models/dataclient/create-mocks';
+} from '../../../dataclient/create-mocks';
 
 describe('player commands', () => {
   describe('player votes', () => {

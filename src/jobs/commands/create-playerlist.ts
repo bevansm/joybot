@@ -1,4 +1,4 @@
-import { ISlot, createSlot } from '../../models/data-types';
+import { ISlot, createSlot } from '../../dataclient/data-types';
 
 // The list of substrings that joybot will look for
 const playerlistTitles = ['playerlist', 'players'];

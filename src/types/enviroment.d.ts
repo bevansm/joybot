@@ -5,6 +5,9 @@ declare global {
       FORUM_URL: string;
       GAMES_ID: string;
 
+      // if provided, will use to pop up webapp where user can input the key.
+      SITE_KEY: string;
+
       USER: string;
       PASSWORD: string;
 
@@ -19,6 +22,9 @@ declare global {
        * A sample post and avalible params can be found in the README.
        */
       START_COMMAND: string;
+
+      // When developing locally, can use session token from browser
+      _S?: string;
     }
   }
 }

@@ -4,8 +4,8 @@ import lodash from 'lodash';
 import path from 'path';
 import fs from 'fs';
 
-import { IGame } from '../../models/data-types';
-import MockDataclient from '../../models/dataclient/MockDataclient';
+import { IGame } from '../../dataclient/data-types';
+import MockDataclient from '../../dataclient/MockDataclient';
 import MockPHPBBApi from '../../phpbb-api/MockPHPBBApi';
 import Manager from '../../jobs/live-game-jobs-manager';
 

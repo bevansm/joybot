@@ -1,4 +1,9 @@
-import { ISlot, IGame } from '../models/data-types';
+import { ISlot, IGame } from '../dataclient/data-types';
+
+export interface IPostTokens {
+  formToken: string;
+  lastPostId: string;
+}
 
 export interface IPostOptions {
   votecount?: boolean;
@@ -6,8 +11,10 @@ export interface IPostOptions {
   lynch?: ISlot;
 }
 
+export type IPostConfig = IPostOptions & IPostTokens;
+
 interface IPHPBBApi {
-  post: (game: IGame, options: IPostOptions) => Promise<void>;
+  post: (game: IGame, options: IPostConfig) => Promise<void>;
 }
 
 export default IPHPBBApi;

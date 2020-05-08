@@ -5,7 +5,7 @@ import {
   numOrUndefined,
   isEqual,
 } from '../../utils/format-utils';
-import { IGameInfo, GameType, createInfo } from '../../models/data-types';
+import { IGameInfo, GameType, createInfo } from '../../dataclient/data-types';
 import logger, { Level } from '../../logger/Logger';
 import { isUndefined } from 'lodash';
 
