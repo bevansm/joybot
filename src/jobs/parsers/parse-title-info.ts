@@ -1,6 +1,6 @@
 import { roman } from 'romanjs';
-import { numeralOrUndefined } from '../../utils/format-utils';
 import {
+  numeralOrUndefined,
   splitAndFormat,
   numOrUndefined,
   isEqual,

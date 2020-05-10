@@ -33,7 +33,6 @@ const manageGameJob = async (
   let lynchedPlayer: ISlot;
   let shouldPrint;
   let pCurrentPost: string = `p${lastPost}`;
-  let formToken: string;
 
   while (getNextPage) {
     const $ = await axios
@@ -45,7 +44,6 @@ const manageGameJob = async (
 
     const page = Number($('div.pagination span strong').text());
     const posts = $('div.post').toArray();
-    formToken = $('input[form_token]').attr('form_token');
 
     for (const post of posts) {
       const id = $(post).attr('id');
@@ -65,8 +63,6 @@ const manageGameJob = async (
     votecount: true,
     gameInfo: shouldPrint,
     lynch: lynchedPlayer,
-    formToken: formToken,
-    lastPostId: pCurrentPost.substring(1),
   });
   if (lynchedPlayer) Manager.stopJob(gameId);
 

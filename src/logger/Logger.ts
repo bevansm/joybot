@@ -20,6 +20,8 @@ const Logger = {
       console.log(JSON.stringify(log));
     } else if (process.env.NODE_ENV === 'dev') {
       console.log(JSON.stringify(log));
+    } else {
+      console.log(JSON.stringify(log));
     }
   },
 };

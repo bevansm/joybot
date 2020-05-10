@@ -32,6 +32,7 @@ JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
 - [ ] Post Support
 - [ ] PM Support
 - [ ] API Implementation
+- [ ] Middleware for axios for saving cookies
 
 # Automation
 

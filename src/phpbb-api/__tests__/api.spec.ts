@@ -10,7 +10,7 @@ describe('phpbb api tests', () => {
     });
 
     it('should be able to make a request to post', async () => {
-      await PHPBAPI.post(game, { formToken: '123', lastPostId: '213' });
+      await PHPBAPI.post(game, {});
     });
   });
 });

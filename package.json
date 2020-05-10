@@ -7,7 +7,8 @@
     "test": "jest",
     "dev": "ts-node-dev --respawn --transpileOnly src/index.ts",
     "validate": "tslint --project tsconfig.json",
-    "prod": "npm run validate && tsc"
+    "prod": "npm run validate && tsc",
+    "sanity": "ts-node --files  --files src/phpbb-api/__tests__/manager.manual.ts"
   },
   "repository": {
     "type": "git",
