@@ -4,11 +4,11 @@
 
 JoyBot is a mafia game management service, intended to be used on the BlankMediaGames forums. It can be used to help automate votecounts and store game data, with a bit of help from the hosts.
 
-JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
+JoyBot is essentially a NoSQL DB combined with a series of cron jobs. It:
 
 1. Scrapes the games topic for active games (i.e. stickied, unlocked games)
 2. Scrapes each active game for votecounts
-3. Maintains "last read" posts and legacy votecounts in a CouchBase DB
+3. Maintains "last read" posts and legacy votecounts in a NoSQL DB
 4. Resets vote counts if commanded by a host
 
 ## Worklist
@@ -29,10 +29,10 @@ JoyBot is essentially a CouchBase DB combined with a series of cron jobs. It:
 - [x] Monitoring active games
 - [x] Automatic job generation
 - [ ] Database
-- [ ] Post Support
+- [x] Post Support
 - [ ] PM Support
 - [ ] API Implementation
-- [ ] Middleware for axios for saving cookies
+- [x] Middleware for axios for saving cookies
 
 # Automation
 

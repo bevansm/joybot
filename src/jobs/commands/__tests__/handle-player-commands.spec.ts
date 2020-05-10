@@ -3,10 +3,7 @@ import {
   PlayerCommands,
 } from './../handle-player-command';
 
-import {
-  createMockGame,
-  createMockPlayers,
-} from '../../../dataclient/create-mocks';
+import { createMockGame, createMockPlayers } from '../../../model/create-mocks';
 
 describe('player commands', () => {
   describe('player votes', () => {

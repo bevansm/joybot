@@ -1,4 +1,4 @@
-import { ISlot, IVote, INamed } from '../dataclient/data-types';
+import { ISlot, IVote, INamed } from '../model/data-types';
 import { isEqual } from './format-utils';
 import { isInteger } from 'lodash';
 import { findBestMatch } from 'string-similarity';

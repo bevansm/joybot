@@ -10,7 +10,7 @@ import {
   List,
 } from './TagDecorators';
 import { Votecount } from './Votecount';
-import { IGame, ISlot } from './../dataclient/data-types';
+import { IGame, ISlot } from '../model/data-types';
 
 interface PostMaker {
   withVotecount: () => PostMaker;

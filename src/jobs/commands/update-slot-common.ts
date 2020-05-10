@@ -1,4 +1,4 @@
-import { ISlot } from '../../dataclient/data-types';
+import { ISlot } from '../../model/data-types';
 import { removeVote } from './handle-player-command';
 
 /**

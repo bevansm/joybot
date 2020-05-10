@@ -3,9 +3,9 @@ import { isUndefined } from 'lodash';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { ISlot, IGame, IHost } from '../dataclient/data-types';
-import IDataclient from '../dataclient/IDataclient';
-import Dataclient from '../dataclient/Dataclient';
+import { ISlot, IGame, IHost } from '../model/data-types';
+import IDataclient from '../model/IDataclient';
+import { getClient } from '../model/Dataclient';
 import IPHPBBApi from '../phpbb-api/IPHBBApi';
 import PHPBAPI from '../phpbb-api/PHPBBApi';
 import Manager from './live-game-jobs-manager';
@@ -19,9 +19,11 @@ import logger, { Level } from '../logger/Logger';
 
 const manageGameJob = async (
   gameId: string,
-  dataclient: IDataclient = Dataclient,
+  dataclient: IDataclient = getClient(),
   poster: IPHPBBApi = PHPBAPI
 ): Promise<void> => {
+  logger.log(Level.INFO, 'Scraping game info...', { gameId });
+
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
   const game: IGame = await dataclient.getGame(gameId);
   const { lastPost, config } = game;
@@ -59,11 +61,13 @@ const manageGameJob = async (
     getNextPage = posts.length === postsPerPage;
   }
 
-  await poster.post(game, {
-    votecount: true,
-    gameInfo: shouldPrint,
-    lynch: lynchedPlayer,
-  });
+  const { hosts } = game;
+  if (hosts.length > 0)
+    await poster.post(game, {
+      votecount: true,
+      gameInfo: shouldPrint,
+      lynch: lynchedPlayer,
+    });
   if (lynchedPlayer) Manager.stopJob(gameId);
 
   await dataclient.updateGame({ ...game, lastPost: pCurrentPost.substring(1) });

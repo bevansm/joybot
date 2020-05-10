@@ -1,5 +1,6 @@
 import cron, { CronTime, CronCommand, CronJob, CronJobParameters } from 'cron';
 import logger, { Level } from './../logger/Logger';
+import { noop } from 'lodash';
 
 type Time = string | moment.Moment;
 interface IUpdateConfig {
@@ -29,7 +30,7 @@ const Manager: IManager = {
       return;
     } else {
       logger.log(Level.INFO, `starting job for ${name}`, { name });
-      Jobs[name] = new CronJob(cronTime, job);
+      Jobs[name] = new CronJob(cronTime, job, noop, true);
     }
   },
   stopJob(name: string): void {

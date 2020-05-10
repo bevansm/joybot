@@ -1,4 +1,4 @@
-import { ISlot, IHost } from '../dataclient/data-types';
+import { ISlot, IHost } from '../model/data-types';
 import { List, Strikethrough, Link, Newlines, Color } from './TagDecorators';
 
 const ISO = (name: string, topic: string) =>

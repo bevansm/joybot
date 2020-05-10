@@ -1,5 +1,5 @@
 import { parsePrefix, parseTitle, parseGameInfo } from '../parse-title-info';
-import { IGameInfo, GameType } from '../../../dataclient/data-types';
+import { IGameInfo, GameType } from '../../../model/data-types';
 
 interface ISampleInfo {
   raw: string;

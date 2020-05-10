@@ -1,4 +1,4 @@
-import { ISlot, IGame } from '../dataclient/data-types';
+import { ISlot, IGame } from '../model/data-types';
 
 export interface IPostConfig {
   votecount?: boolean;

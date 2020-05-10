@@ -6,7 +6,7 @@ import {
   IGame,
   createSlot,
   IConfig,
-} from '../../dataclient/data-types';
+} from '../../model/data-types';
 
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import {
@@ -17,7 +17,6 @@ import {
 } from '../../utils/format-utils';
 import { hasUser, getUser, findMaj } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
-import { compareTwoStrings } from 'string-similarity';
 
 export enum HostCommands {
   PRINT = 'print',

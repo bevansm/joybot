@@ -75,7 +75,7 @@ axios.interceptors.request.use(async req => {
       headers,
     });
   } else if (url.indexOf(process.env.FORUM_URL) > -1) {
-    logger.log(Level.INFO, 'Outgoing request', { url, method, headers });
+    logger.log(Level.INFO, 'Outgoing request', { url, method });
     req.jar = jar;
     req.withCredentials = true;
     headers['User-Agent'] = "Mozilla/5.0 (moon's messing around)";
@@ -94,9 +94,9 @@ axios.interceptors.response.use(async res => {
   const {
     data,
     headers,
-    config: { headers: reqHeaders, data: reqData, url },
+    config: { headers: reqHeaders, data: reqData, url, method },
   } = res;
-  logger.log(Level.INFO, 'Incoming response', { url, headers, reqHeaders });
+  logger.log(Level.INFO, 'Incoming response', { url, method });
 
   // If we made the request to the forum, make sure our cookies are up to date
   if (typeof data === 'string' && url.indexOf(process.env.FORUM_URL) > -1) {

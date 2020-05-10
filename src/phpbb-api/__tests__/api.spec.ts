@@ -1,4 +1,4 @@
-import { IGame, createGame, GameType } from '../../dataclient/data-types';
+import { IGame, createGame, GameType } from '../../model/data-types';
 import PHPBAPI from '../PHPBBApi';
 describe('phpbb api tests', () => {
   const sidDescribe = process.env._S ? describe : describe.skip;

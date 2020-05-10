@@ -1,15 +1,17 @@
 import cheerio from 'cheerio';
 import axios from 'axios';
 
+import logger, { Level } from './../logger/Logger';
 import Manager from './live-game-jobs-manager';
 import { startGameJob } from './start-game-job';
-
-const baseUrl = `${process.env.FORUM_URL}/viewforum.php?f=${process.env.GAMES_ID}`;
 
 /**
  * @returns a list of topic numbers of all active games
  */
 export const getActiveGames = async (): Promise<string[]> => {
+  const baseUrl = `${process.env.FORUM_URL}/viewforum.php?f=${process.env.GAMES_ID}`;
+  logger.log(Level.INFO, 'Grabbing active games');
+
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
   let start = 0;
   let hasNextPage = false;
@@ -17,9 +19,13 @@ export const getActiveGames = async (): Promise<string[]> => {
   let pages: string[] = [];
 
   do {
-    $ = await axios
-      .get(`${baseUrl}&start=${start}`)
-      .then(res => cheerio.load(res.data));
+    try {
+      $ = cheerio.load((await axios.get(`${baseUrl}&start=${start}`)).data);
+    } catch (e) {
+      logger.log(Level.ERROR, 'Unable to grab game threads', { e });
+      process.exit(1);
+    }
+
     const topics = ($(
       'dl[style*="sticky_unread.gif"], dl[style*="sticky_read.gif"]'
     )
@@ -40,6 +46,7 @@ export const getActiveGames = async (): Promise<string[]> => {
 };
 
 export const manageActiveGames = async (games: string[]) => {
+  logger.log(Level.INFO, 'Starting jobs for games', { games });
   const oldGames = Manager.getJobs();
   oldGames.forEach(g => {
     if (!games.includes(g)) Manager.stopJob(g);
