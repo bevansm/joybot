@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "build": "tsc",
     "dev": "ts-node --files src/index.ts",
     "validate": "tslint --project tsconfig.json",
-    "prod": "tsc && node dist/index.js",
+    "prod": "node dist/index.js",
     "sanity": "ts-node --files src/phpbb-api/__tests__/manager.manual.ts"
   },
   "repository": {

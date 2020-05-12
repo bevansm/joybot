@@ -105,7 +105,7 @@ JoyBot expects PMS with:
 ## Setup
 
 1. Fill out the `.env` file.
-2. `docker-compose up`.
+2. `docker-compose run joybot`.
 3. Provide a captcha.
 
 ### Captcha
