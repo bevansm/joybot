@@ -24,6 +24,8 @@ export const startGameJob = async (
     });
     return;
   }
+
+  logger.log(Level.INFO, 'starting a job for a game', game);
   const {
     config: { interval },
     id,
@@ -46,7 +48,7 @@ export const initGame = async (
       baseUrl,
       gameId,
     });
-    const title = $(`a[href="./viewtopic.php?f=17&t=${gameId}"]`).text();
+    const title = $(`a[href="./viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}"]`).text();
     logger.log(Level.DEBUG, `successfully found title for ${gameId}`, {
       baseUrl,
       gameId,
