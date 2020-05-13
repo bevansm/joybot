@@ -8,7 +8,7 @@ export const Votecount = (slots: ISlot[], majority: number): string => {
   );
 
   return `[votes=${majority}]${sorted
-    .filter(({ voting }) => voting.length)
+    .filter(({ votedBy }) => votedBy.length)
     .map(
       ({ name, votedBy }) =>
         `${name}|${sumVotes(votedBy)}|${votedBy
@@ -20,6 +20,7 @@ export const Votecount = (slots: ISlot[], majority: number): string => {
     ${Center(
       `Not Voting: ${slots
         .filter(({ voting, isAlive }) => !voting.length && isAlive)
+        .map(({ name }) => name)
         .join(', ')}`
     )}`;
 };
