@@ -13,9 +13,9 @@ export const List = (
   ordered: boolean = true,
   numbered: boolean = true
 ) =>
-  `[list${ordered && numbered ? '=1' : ''}]${components.map(
-    c => `[*]${c}`
-  )}[/list]`;
+  `[list${ordered && numbered ? '=1' : ''}]${components
+    .map(c => `[*]${c}`)
+    .join('')}[/list]`;
 
 export const Strikethrough = (component: string) => `[s]${component}[/s]`;
 
