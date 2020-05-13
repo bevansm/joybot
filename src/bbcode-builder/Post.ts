@@ -42,16 +42,17 @@ export const Post = (game: IGame): PostMaker => {
       return this;
     },
     withISOs() {
-      post.push(
-        Spoiler(
-          Newlines([
-            Bold(Underline('Hosts')),
-            HostISOs(hosts, id),
-            players.length > 0 ? Bold(Underline('Playerlist')) : '',
-            players.length > 0 ? PlayerISOs(players, id) : '',
-          ])
-        )
-      );
+      const res = [];
+      res.push(Newlines([Bold(Underline('Hosts')), HostISOs(hosts, id)], true));
+      if (players.length > 0) {
+        res.push(
+          Newlines(
+            [Bold(Underline('Playerlist')), PlayerISOs(players, id)],
+            true
+          )
+        );
+      }
+      post.push(Spoiler(Newlines(res)));
       return this;
     },
     finish: () => Newlines(post),

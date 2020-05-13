@@ -1,8 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import qs from 'querystring';
-import fs from 'fs';
-import path from 'path';
 
 import CookieManager from './CookieManager';
 import { Post } from './../bbcode-builder/Post';
@@ -96,7 +94,6 @@ export const postPost = async (post: Post, forum: string, topic: string) => {
       $('div').text().indexOf('This message has been posted successfully') ===
       -1
     ) {
-      fs.writeFileSync(path.resolve(__dirname, `recieved-page.html`), data);
       throw new Error(
         'Unable to successfully post message; did not recieve redirect.'
       );

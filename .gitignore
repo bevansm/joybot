@@ -2,6 +2,7 @@ node_modules
 dist
 local-db
 report.*
+**/recieved-page.html
 
 *.env
 !.mock.env

@@ -24,7 +24,7 @@ export const createPlayerlist = (
 ): ISlot[] => {
   const playerNames = ($(postContent)
     .find(playerlistSelectorString)
-    .next('ol, ul')
+    .nextAll('ol, ul')
     .children('li')
     .map((_, e) => $(e).text().trim().split(' ')[0].trim())
     .toArray() as unknown) as string[];

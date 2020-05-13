@@ -124,9 +124,6 @@ const handleHostPost = (
     const upperLine = line.toUpperCase();
     if (upperLine.indexOf(startCommand) > -1) {
       line = line.substring(upperLine.indexOf(startCommand));
-      if (name === 'moonbird') {
-        logger.log(Level.DEBUG, line, { name });
-      }
       if (hosts.length === 0) addHost(name, '#000', hosts);
       const res = handleHostCommand(game, line, $, content);
       if (!isUndefined(res)) print = res;
@@ -137,12 +134,11 @@ const handleHostPost = (
   if (host) {
     const { hex } = host;
     if (hex === '#000') host.hex = parseHex(content, $) || '#000';
-  } else if (name === 'moonbird' && game.id === '108496') {
+  } else {
     logger.log(Level.ERROR, "expected a host but didn't find one", {
       name,
       gameId: game.id,
       lines: text.length,
-      content: $(content).text(),
     });
   }
 

@@ -17,6 +17,7 @@ import {
 } from '../../utils/format-utils';
 import { hasUser, getUser, findMaj } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
+import logger, { Level } from '../../logger/Logger';
 
 export enum HostCommands {
   PRINT = 'print',
@@ -79,6 +80,7 @@ export const applyCommand = (
   const boolArg1 = boolOrUndefined(args[1]);
   const boolArg3 = boolOrUndefined(args[3]);
   const { hosts, players, config } = game;
+  logger.log(Level.INFO, 'Handling host command', { command, args });
 
   switch (args[0]) {
     case HostCommands.PRINT:

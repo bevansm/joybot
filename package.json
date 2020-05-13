@@ -9,8 +9,7 @@
     "dev": "ts-node --files src/index.ts",
     "dev:watch": "nodemon",
     "validate": "tslint --project tsconfig.json",
-    "prod": "node dist/index.js",
-    "sanity": "ts-node --files src/phpbb-api/__tests__/manager.manual.ts"
+    "prod": "node dist/index.js"
   },
   "repository": {
     "type": "git",
