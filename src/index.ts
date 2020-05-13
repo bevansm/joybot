@@ -20,7 +20,7 @@ const runner = async () => {
   const job = new CronJob('0 */1 * * * *', checkGamesHandler);
   job.start();
 
-  app.listen(8888);
+  app.listen(80);
 };
 
 runner();

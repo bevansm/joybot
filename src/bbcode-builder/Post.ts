@@ -47,8 +47,8 @@ export const Post = (game: IGame): PostMaker => {
           Newlines([
             Bold(Underline('Hosts')),
             HostISOs(hosts, id),
-            Bold(Underline('Playerlist')),
-            PlayerISOs(players, id),
+            players.length > 0 ? Bold(Underline('Playerlist')) : '',
+            players.length > 0 ? PlayerISOs(players, id) : '',
           ])
         )
       );

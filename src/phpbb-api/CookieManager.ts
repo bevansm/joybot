@@ -67,25 +67,29 @@ axios.defaults.timeout = 60000;
 
 // Always make sure that we're posting from a web browser
 axios.interceptors.request.use(async req => {
-  const { url, method, headers } = req;
+  const {
+    url,
+    method,
+    headers,
+    headers: { common },
+    data,
+  } = req;
   if (headers.Cookie) {
     logger.log(Level.ERROR, 'Found unexpected cookies on header.', {
       url,
       method,
       headers,
     });
-  } else if (url.indexOf(process.env.FORUM_URL) > -1) {
-    logger.log(Level.INFO, 'Outgoing request', { url, method });
+  }
+  if (url.indexOf(process.env.FORUM_URL) > -1) {
     req.jar = jar;
     req.withCredentials = true;
-    headers['User-Agent'] = "Mozilla/5.0 (moon's messing around)";
-
-    if (isEqual(method, 'post')) {
-      headers['Accept-Encoding'] = 'gzip, deflate, br';
-      headers.Accept =
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
-    }
+    common['User-Agent'] = "Mozilla/5.0 (moon's messing around)";
+    common['Accept-Encoding'] = 'gzip, deflate, br';
+    common.Accept =
+      'text/html,application/xhtml+xml,application/xml,application/json,*/*;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
   }
+  logger.log(Level.INFO, 'Outgoing request', { url, method, data, headers });
   return req;
 });
 
@@ -95,8 +99,15 @@ axios.interceptors.response.use(async res => {
     data,
     headers,
     config: { headers: reqHeaders, data: reqData, url, method },
+    status,
+    statusText,
   } = res;
-  logger.log(Level.INFO, 'Incoming response', { url, method });
+  logger.log(Level.INFO, 'Incoming response', {
+    url,
+    method,
+    status,
+    statusText,
+  });
 
   // If we made the request to the forum, make sure our cookies are up to date
   if (typeof data === 'string' && url.indexOf(process.env.FORUM_URL) > -1) {

@@ -37,6 +37,7 @@ JoyBot is essentially a NoSQL DB combined with a series of cron jobs. It:
 # Automation
 
 - [x] Automated deploy with docker
+- [x] Fix ERRCONNECT issue w/docker
 - [ ] Automated deploy on AWS EC2/GCP
 - [x] Node logging library
 

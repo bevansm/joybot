@@ -64,8 +64,10 @@ interface IGameMain {
 
 export type IGame = IGameMain & Partial<IGameInfo>;
 
+const getInterval = () =>
+  numOrUndefined(process.env.DEFAULT_VOTECOUNT_TIMEOUT) || 60;
 export const DefaultConfig: IConfig = {
-  interval: numOrUndefined(process.env.DEFAULT_VOTECOUNT_TIMEOUT) || 60,
+  interval: getInterval(),
   autolock: false,
   majority: 1,
   enabled: true,
@@ -92,7 +94,7 @@ export const createGame = (id: string, info: IGameInfo): IGame =>
       id,
       hosts: [],
       players: [],
-      config: { ...DefaultConfig },
+      config: { ...DefaultConfig, interval: getInterval() },
       lastPost: '0',
     },
     { ...info }

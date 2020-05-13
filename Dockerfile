@@ -1,5 +1,9 @@
 FROM node:12.16.3-alpine3.11
-EXPOSE 8080
+EXPOSE 80
+
+RUN apk add --update \
+    curl \
+    && rm -rf /var/cache/apk/*
 
 COPY *.json /
 RUN npm i

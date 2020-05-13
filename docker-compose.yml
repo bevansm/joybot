@@ -1,8 +1,12 @@
-version: '3'
+version: '3.2'
 services:
   joybot:
     build: .
     env_file:
       - .env
     ports:
-      - '8080:8080'
+      - '80:80'
+    volumes:
+      - type: bind
+        source: ./local-db
+        target: /local-db

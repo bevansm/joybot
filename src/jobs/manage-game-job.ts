@@ -37,9 +37,15 @@ const manageGameJob = async (
   let pCurrentPost: string = `p${lastPost}`;
 
   while (getNextPage) {
-    const $ = await axios
-      .get(`${baseUrl}${queryString}`)
-      .then(res => cheerio.load(res.data));
+    let $;
+    try {
+      $ = await axios
+        .get(`${baseUrl}${queryString}`)
+        .then(res => cheerio.load(res.data));
+    } catch (e) {
+      logger.log(Level.ERROR, 'Unable to retrieve page...', { queryString });
+      break;
+    }
 
     // Kill all quoted posts
     $('blockquote').remove();
@@ -114,8 +120,13 @@ const handleHostPost = (
 
   let print;
 
-  for (const line of text) {
-    if (line.toUpperCase().indexOf(startCommand) === 0) {
+  for (let line of text) {
+    const upperLine = line.toUpperCase();
+    if (upperLine.indexOf(startCommand) > -1) {
+      line = line.substring(upperLine.indexOf(startCommand));
+      if (name === 'moonbird') {
+        logger.log(Level.DEBUG, line, { name });
+      }
       if (hosts.length === 0) addHost(name, '#000', hosts);
       const res = handleHostCommand(game, line, $, content);
       if (!isUndefined(res)) print = res;
@@ -126,11 +137,12 @@ const handleHostPost = (
   if (host) {
     const { hex } = host;
     if (hex === '#000') host.hex = parseHex(content, $) || '#000';
-  } else {
+  } else if (name === 'moonbird' && game.id === '108496') {
     logger.log(Level.ERROR, "expected a host but didn't find one", {
       name,
       gameId: game.id,
       lines: text.length,
+      content: $(content).text(),
     });
   }
 

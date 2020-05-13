@@ -1,6 +1,8 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import qs from 'querystring';
+import fs from 'fs';
+import path from 'path';
 
 import CookieManager from './CookieManager';
 import { Post } from './../bbcode-builder/Post';
@@ -8,20 +10,19 @@ import logger, { Level } from './../logger/Logger';
 import { IGame } from '../model/data-types';
 import IPHPBBApi, { IPostConfig } from './IPHBBApi';
 
-const baseUrl = process.env.FORUM_URL;
-const gamesId = process.env.GAMES_ID;
-
 const PHPBAPI: IPHPBBApi = {
   post: async (game: IGame, options: IPostConfig) => {
+    const gamesId = process.env.GAMES_ID;
     const { lynch = null, gameInfo = false, votecount = true } = options;
     const {
       id,
       config: { autolock },
       title,
+      players,
     } = game;
 
     const post = Post(game);
-    if (votecount) post.withVotecount();
+    if (votecount && players.length > 0) post.withVotecount();
     if (lynch) post.withLynched(lynch);
     post.withISOs();
     if (gameInfo) post.withInfo();
@@ -43,9 +44,19 @@ export const getPostToken = async (
   topic: string
 ): Promise<PostToken> =>
   (await axios
-    .get(`${baseUrl}/posting.php?mode=reply&f=${forum}&t=${topic}`)
+    .get(
+      `${process.env.FORUM_URL}/posting.php?mode=reply&f=${forum}&t=${topic}`
+    )
     .then(res => cheerio.load(res.data))
-    .then(getHidden)) as PostToken;
+    .then(getHidden)
+    .catch(e => {
+      logger.log(Level.ERROR, 'unable to retrieve post token', {
+        forum,
+        topic,
+        e,
+      });
+      return undefined;
+    })) as PostToken;
 
 interface Post {
   message: string;
@@ -54,8 +65,8 @@ interface Post {
 
 export const postPost = async (post: Post, forum: string, topic: string) => {
   const res = await getPostToken(forum, topic);
-  const { creation_time, form_token } = res;
-  if (!form_token) {
+  const { creation_time, form_token } = res || {};
+  if (!res || !form_token) {
     logger.log(Level.INFO, 'Unable to post; thread is likely locked', res);
     return;
   }
@@ -67,13 +78,32 @@ export const postPost = async (post: Post, forum: string, topic: string) => {
     lastclick: creation_time,
     post: 'Submit',
     attach_sig: 'on',
+    notify: 'on',
   };
-
-  await axios.post(
-    `${baseUrl}/posting.php?mode=reply&f=${forum}&t=${topic}`,
-    qs.stringify(form),
-    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  );
+  try {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    const data = await axios
+      .post(
+        `${process.env.FORUM_URL}/posting.php?mode=reply&f=${forum}&t=${topic}`,
+        qs.stringify(form),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      )
+      .then(res => res.data);
+    const $ = cheerio.load(data);
+    if (
+      $('div').text().indexOf('This message has been posted successfully') ===
+      -1
+    ) {
+      fs.writeFileSync(path.resolve(__dirname, `recieved-page.html`), data);
+      throw new Error(
+        'Unable to successfully post message; did not recieve redirect.'
+      );
+    }
+  } catch (e) {
+    logger.log(Level.ERROR, 'Unable to create post', { form, topic, e });
+  }
 };
 
 interface LockToken {
@@ -88,18 +118,29 @@ interface LockToken {
 export const lockTopic = async (forum: string, topic: string) => {
   const sid = CookieManager.getSession();
   const res = await getPostToken(forum, topic);
+  if (!res) return;
   const confirmForm = {
     ...res,
     action: 'lock',
   };
 
-  const $ = await axios
-    .post(
-      `${baseUrl}/mcp.php?f=${forum}&t=${topic}&quickmod=1&sid=${sid}&redirect=.`,
-      qs.stringify(confirmForm),
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    )
-    .then(({ data }) => cheerio.load(data));
+  let $;
+  try {
+    $ = await axios
+      .post(
+        `${process.env.FORUM_URL}/mcp.php?f=${forum}&t=${topic}&quickmod=1&sid=${sid}&redirect=.`,
+        qs.stringify(confirmForm),
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      )
+      .then(({ data }) => cheerio.load(data));
+  } catch (e) {
+    logger.log(Level.ERROR, 'unable to retrieve post lock form', {
+      forum,
+      topic,
+      e,
+    });
+    return;
+  }
 
   const lockForm = {
     ...getHidden($),
@@ -114,9 +155,18 @@ export const lockTopic = async (forum: string, topic: string) => {
     return;
   }
 
-  await axios.post(`${baseUrl}/${queryString}`, qs.stringify(lockForm), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  });
+  try {
+    await axios.post(
+      `${process.env.FORUM_URL}/${queryString}`,
+      qs.stringify(lockForm),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+  } catch (e) {
+    logger.log(Level.ERROR, 'unable to lock topic', { forum, topic, e });
+    return;
+  }
 };
 
 const getHidden = ($: CheerioStatic): PostToken | LockToken =>

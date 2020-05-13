@@ -7,6 +7,7 @@
     "test": "jest",
     "build": "tsc",
     "dev": "ts-node --files src/index.ts",
+    "dev:watch": "nodemon",
     "validate": "tslint --project tsconfig.json",
     "prod": "node dist/index.js",
     "sanity": "ts-node --files src/phpbb-api/__tests__/manager.manual.ts"
@@ -42,12 +43,24 @@
     "@types/string-similarity": "^3.0.0",
     "@types/tough-cookie": "^4.0.0",
     "jest": "^25.5.4",
+    "nodemon": "^2.0.3",
     "ts-jest": "^25.4.0",
     "ts-node": "^8.9.1",
     "ts-node-dev": "^1.0.0-pre.44",
     "tslint": "^5.1.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.3"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "exec": "npm run dev",
+    "ext": "ts",
+    "ignore": [
+      "*.spec.ts"
+    ],
+    "delay": "3"
   },
   "jest": {
     "roots": [
