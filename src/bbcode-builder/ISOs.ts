@@ -1,5 +1,12 @@
 import { ISlot, IHost } from '../model/data-types';
-import { List, Strikethrough, Link, Newlines, Color } from './TagDecorators';
+import {
+  List,
+  Strikethrough,
+  Link,
+  Newlines,
+  Color,
+  Bold,
+} from './TagDecorators';
 
 const ISO = (name: string, topic: string) =>
   Link(name, `${process.env.FORUM_URL}/search.php?t=${topic}&author=${name}`);
@@ -20,4 +27,4 @@ export const PlayerISOs = (
   );
 
 export const HostISOs = (hosts: IHost[], topic: string): string =>
-  Newlines(hosts.map(({ name, hex }) => Color(ISO(name, topic), hex)));
+  Newlines(hosts.map(({ name, hex }) => ISO(Bold(Color(name, hex)), topic)));
