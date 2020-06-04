@@ -2,6 +2,7 @@ version: '3.2'
 services:
   joybot:
     build: .
+    network_mode: host
     env_file:
       - .env
     ports:
@@ -11,4 +12,3 @@ services:
         source: ./local-db
         target: /local-db
     container_name: joybot
-
