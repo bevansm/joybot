@@ -1,4 +1,3 @@
-import { sumVotes } from './../../utils/user-utils';
 import axios from 'axios';
 import lodash from 'lodash';
 import path from 'path';
@@ -12,12 +11,10 @@ import Manager from '../../jobs/live-game-jobs-manager';
 import manageGameJob from '../manage-game-job';
 import startGameJob from './../start-game-job';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 describe('integration tests', () => {
   let oldPostsPerValue: string;
   let oldCommandValue: string;
+  let oldIDValue: string;
 
   beforeAll(() => {
     process.env.NODE_ENV = 'prod';
@@ -27,10 +24,14 @@ describe('integration tests', () => {
 
     oldCommandValue = process.env.START_COMMAND;
     process.env.START_COMMAND = '!joybot';
+
+    oldIDValue = process.env.GAMES_ID;
+    process.env.GAMES_ID = '17';
   });
   afterAll(() => {
     process.env.POSTS_PER_PAGE = oldPostsPerValue;
     process.env.START_COMMAND = oldCommandValue;
+    process.env.GAMES_ID = oldIDValue;
   });
 
   const pages = [1, 2, 3].map(p =>
@@ -44,7 +45,9 @@ describe('integration tests', () => {
   it('it should handle a basic three page game', async () => {
     const gameId = `108218`;
     let game;
-    mockedAxios.get
+    const mockGet = jest.spyOn(axios, 'get');
+
+    mockGet
       .mockResolvedValueOnce({ data: pages[0] })
       // Start of p1
       .mockImplementationOnce(async () => {
@@ -104,7 +107,7 @@ describe('integration tests', () => {
 
     await manageGameJob(gameId, MockDataclient, MockPHPBBApi);
 
-    expect(mockedAxios.get).toHaveBeenCalledTimes(4);
+    expect(mockGet).toHaveBeenCalledTimes(4);
     expect(mockPosterPost).toHaveBeenCalledTimes(1);
     const { lynch, gameInfo } = mockPosterPost.mock.calls[0][1];
 

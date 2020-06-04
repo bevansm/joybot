@@ -4,9 +4,6 @@ import fs from 'fs';
 
 import { getActiveGames } from '../check-games-job';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 describe('game checking test', () => {
   let oldEnvValue: string;
   beforeAll(() => {
@@ -29,8 +26,8 @@ describe('game checking test', () => {
 
   describe('getGames tests', () => {
     it('should return no games if there are none', async () => {
-      // @ts-ignore
-      mockedAxios.get.mockReturnValueOnce(
+      const mockGet = jest.spyOn(axios, 'get');
+      mockGet.mockReturnValueOnce(
         Promise.resolve({
           data: noGames,
         })
@@ -39,14 +36,14 @@ describe('game checking test', () => {
       expect(games.length).toEqual(0);
     });
     it('should return games from one page', async () => {
-      // @ts-ignore
-      mockedAxios.get.mockReturnValueOnce(Promise.resolve({ data: twoGames }));
+      const mockGet = jest.spyOn(axios, 'get');
+      mockGet.mockReturnValueOnce(Promise.resolve({ data: twoGames }));
       const games = await getActiveGames();
       expect(games.length).toEqual(2);
     });
     it('should return games from multiple pages', async () => {
-      // @ts-ignore
-      mockedAxios.get
+      const mockGet = jest.spyOn(axios, 'get');
+      mockGet
         .mockResolvedValueOnce({ data: twentyFiveGames })
         .mockResolvedValueOnce({ data: twoGames });
       const games = await getActiveGames();

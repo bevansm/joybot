@@ -1,3 +1,4 @@
+import { Role, UserAction } from './role-types';
 import { merge } from 'lodash';
 import { numOrUndefined } from '../utils/format-utils';
 
@@ -16,6 +17,11 @@ export interface ISlot {
   voteWeight: number;
   canSplitVote: boolean;
   extraVotesToLynch: number;
+  role?: Role;
+  actions?: {
+    current: UserAction[];
+    cache: {};
+  };
 }
 
 export interface IHost {
@@ -47,6 +53,16 @@ export enum GameType {
   UNKNOWN = 'UNKNOWN',
 }
 
+export enum GamePhaseType {
+  NIGHT = 'night',
+  DAY = 'day',
+}
+
+export interface GamePhase {
+  type: GamePhaseType;
+  no: number;
+}
+
 export interface IGameInfo {
   type: GameType;
   gameNumber: number;
@@ -60,6 +76,7 @@ interface IGameMain {
   hosts: IHost[];
   players: ISlot[];
   lastPost: string;
+  phase: GamePhase;
 }
 
 export type IGame = IGameMain & Partial<IGameInfo>;

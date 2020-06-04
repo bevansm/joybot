@@ -80,7 +80,7 @@ export const applyCommand = (
   const boolArg1 = boolOrUndefined(args[1]);
   const boolArg3 = boolOrUndefined(args[3]);
   const { hosts, players, config } = game;
-  logger.log(Level.INFO, 'Handling host command', { command, args });
+  logger.log(Level.DEBUG, 'Handling host command', { command, args });
 
   switch (args[0]) {
     case HostCommands.PRINT:

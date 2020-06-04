@@ -8,8 +8,11 @@ import {
   Bold,
 } from './TagDecorators';
 
-const ISO = (name: string, topic: string) =>
-  Link(name, `${process.env.FORUM_URL}/search.php?t=${topic}&author=${name}`);
+const ISO = (name: string, topic: string, contents?: string) =>
+  Link(
+    contents || name,
+    `${process.env.FORUM_URL}/search.php?t=${topic}&author=${name}`
+  );
 
 export const PlayerISOs = (
   users: ISlot[],
@@ -27,4 +30,6 @@ export const PlayerISOs = (
   );
 
 export const HostISOs = (hosts: IHost[], topic: string): string =>
-  Newlines(hosts.map(({ name, hex }) => ISO(Bold(Color(name, hex)), topic)));
+  Newlines(
+    hosts.map(({ name, hex }) => ISO(name, topic, Bold(Color(name, hex))))
+  );

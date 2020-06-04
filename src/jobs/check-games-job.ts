@@ -26,7 +26,9 @@ export const getActiveGames = async (): Promise<string[]> => {
       process.exit(1);
     }
 
-    const topics = ($('dl[style*="sticky_unread"], dl[style*="sticky_read"]')
+    const topics = ($(
+      'dl[style*="sticky_unread.gif"], dl[style*="sticky_read_mine.gif"], dl[style*="sticky_read.gif"], dl[style*="sticky_unread_mine.gif"]'
+    )
       .find('a.topictitle')
       .map((_, e) => {
         const link = $(e).attr('href');

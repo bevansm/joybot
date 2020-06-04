@@ -31,12 +31,12 @@ const manageGameJob = async (
   const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
 
   let queryString = `&p=${lastPost}`;
-  let getNextPage: boolean = true;
   let lynchedPlayer: ISlot;
   let shouldPrint;
   let pCurrentPost: string = `p${lastPost}`;
+  let pCurrLastPost;
 
-  while (getNextPage) {
+  while (pCurrLastPost !== pCurrentPost) {
     let $;
     try {
       $ = await axios
@@ -46,6 +46,8 @@ const manageGameJob = async (
       logger.log(Level.ERROR, 'Unable to retrieve page...', { queryString });
       break;
     }
+
+    pCurrLastPost = `p${$('input[name="topic_cur_post_id"]').val()}`;
 
     // Kill all quoted posts
     $('blockquote').remove();
@@ -64,7 +66,6 @@ const manageGameJob = async (
       if (!isUndefined(print)) shouldPrint = print;
     }
     queryString = `&start=${(page + 1) * postsPerPage}`;
-    getNextPage = posts.length === postsPerPage;
   }
 
   const { hosts } = game;
@@ -135,7 +136,7 @@ const handleHostPost = (
     const { hex } = host;
     if (hex === '#000') host.hex = parseHex(content, $) || '#000';
   } else {
-    logger.log(Level.ERROR, "expected a host but didn't find one", {
+    logger.log(Level.DEBUG, "expected a host but didn't find one", {
       name,
       gameId: game.id,
       lines: text.length,
