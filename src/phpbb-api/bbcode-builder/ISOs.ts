@@ -1,4 +1,4 @@
-import { ISlot, IHost } from '../model/data-types';
+import { ISlot, IHost } from '../../model/data-types';
 import {
   List,
   Strikethrough,

@@ -1,4 +1,4 @@
-import { Role, UserAction } from './role-types';
+import { Role, Action, InformedTeam } from './role-types';
 import { merge } from 'lodash';
 import { numOrUndefined } from '../utils/format-utils';
 
@@ -19,8 +19,8 @@ export interface ISlot {
   extraVotesToLynch: number;
   role?: Role;
   actions?: {
-    current: UserAction[];
-    cache: {};
+    current: Action[];
+    cache: Action[][];
   };
 }
 
@@ -56,6 +56,8 @@ export enum GameType {
 export enum GamePhaseType {
   NIGHT = 'night',
   DAY = 'day',
+  PRE = 'pregame',
+  POST = 'postgame',
 }
 
 export interface GamePhase {
@@ -75,6 +77,7 @@ interface IGameMain {
   id: string;
   hosts: IHost[];
   players: ISlot[];
+  informedTeams: InformedTeam[];
   lastPost: string;
   phase: GamePhase;
 }
@@ -111,8 +114,13 @@ export const createGame = (id: string, info: IGameInfo): IGame =>
       id,
       hosts: [],
       players: [],
+      informedTeams: [],
       config: { ...DefaultConfig, interval: getInterval() },
       lastPost: '0',
+      phase: {
+        type: GamePhaseType.PRE,
+        no: 0,
+      },
     },
     { ...info }
   );

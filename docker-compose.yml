@@ -10,3 +10,5 @@ services:
       - type: bind
         source: ./local-db
         target: /local-db
+    container_name: joybot
+

@@ -1,8 +1,11 @@
+import { some, merge } from 'lodash';
+
 /**
  * A lower number means higher priority.
  * In the case of ties, processed by "first submitted"
+ * A priorty of 0 is regarded as a "no action" priority.
  */
-type Priority = 1 | 2 | 3 | 4 | 5;
+export type Priority = 0 | 1 | 2 | 3 | 4 | 5;
 
 /**
  * A list of alignments in the game.
@@ -14,9 +17,28 @@ enum Alignment {
 }
 
 /**
+ * All feedback messages.
+ */
+export const FeedbackMessages = {
+  attack: {
+    immune: 'You were attached last night, but you were immune!',
+    healed: 'You were attacked last night, but a player healed you!',
+    failed: 'Your attack failed last night.',
+  },
+  roleblock: {
+    roleblocked: 'You were roleblocked.',
+    strong:
+      'You were roleblocked, but due to your strength, your action(s) still succeeded!',
+  },
+  bodydouble: 'You were attacked last night, but a player saved you!',
+  cop: "Your target's alignment is: ",
+  killed: 'You killed a player!',
+};
+
+/**
  * All supported action types.
  */
-enum ActionType {
+export enum ActionType {
   HEAL = 'heal',
   KILL = 'kill',
   LK = 'lookout',
@@ -25,6 +47,8 @@ enum ActionType {
   RB = 'roleblock',
   TRACK = 'tracker',
   FRAME = 'framer',
+  INVEST = 'investigate',
+  WITCH = 'redirect',
 }
 
 /**
@@ -33,22 +57,25 @@ enum ActionType {
  * even and odd are true, and every is set to one.
  */
 export interface AllowedPhases {
-  night?: boolean;
-  day?: boolean;
-  even?: boolean;
-  odd?: boolean;
-  every?: number;
+  night: boolean;
+  day: boolean;
+  even: boolean;
+  odd: boolean;
+  every: number;
 }
 
+/**
+ * An ability.
+ * By default, shots is -1 (unlimited) and priority is 5.
+ */
 export interface Ability {
   type: ActionType;
   phases: AllowedPhases;
-  shots?: number;
-  numberOfTargets?: number;
+  shots: number;
   priority: Priority;
 }
 
-enum PassiveType {
+export enum PassiveType {
   IMMUNE_KILL = 'immune_kill',
   IMMUNE_RB = 'immune_rb',
   SILENT = 'ninja',
@@ -58,9 +85,20 @@ enum PassiveType {
   INNO = 'innocent',
 }
 
+/**
+ * A role passive.
+ * By default, shots is -1 (unlimited)
+ */
 export interface Passive {
   type: PassiveType;
-  shots?: number;
+  shots: number;
+}
+
+export interface Action {
+  uuid: string;
+  targets: number[];
+  timestamp: string;
+  ability: Ability;
 }
 
 /**
@@ -69,26 +107,35 @@ export interface Passive {
  */
 export interface InformedTeam {
   slotIds: number[];
-  kill?: boolean;
-  daychat?: boolean;
-  deadchat?: boolean;
-  channel: string;
+  daychat: boolean;
+  deadchat: boolean;
+  channelID: string;
+  ability?: Ability;
+  action?: {
+    current: Action;
+    player: number;
+  };
 }
 
 // A role
 export interface Role {
   name: string;
-  color?: string;
-
+  color: string;
   alignment: Alignment;
-
-  teams?: InformedTeam[];
-
-  concurrentAbilities?: number;
-  abilities: Ability[];
+  concurrentTargets: number;
+  ability: Ability;
   passives: Passive[];
 }
 
-export interface UserAction {
-  target: number;
-}
+// returns true iif a role has a passive and/or has shots remaining
+export const hasPassive = (role: Role, type: PassiveType): boolean =>
+  some(role.passives, p => p.type === type && getHasShots(p));
+
+export const removePassiveShot = (role: Role, type: PassiveType) =>
+  role.passives.forEach(p => p.type === type && removeShot(p));
+
+export const getHasShots = (s: { shots: number }) =>
+  s.shots === -1 || !!s.shots;
+
+export const removeShot = (s: { shots: number }) =>
+  merge(s, { shots: !s.shots || s.shots === -1 ? -1 : s.shots - 1 });

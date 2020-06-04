@@ -3,7 +3,7 @@ import cheerio from 'cheerio';
 import qs from 'querystring';
 
 import CookieManager from './CookieManager';
-import { Post } from './../bbcode-builder/Post';
+import { Post } from './bbcode-builder/Post';
 import logger, { Level } from './../logger/Logger';
 import { IGame } from '../model/data-types';
 import IPHPBBApi, { IPostConfig } from './IPHBBApi';

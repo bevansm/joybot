@@ -1,9 +1,7 @@
-FROM node:12.16.3-alpine3.11
+FROM node:14.4.0-alpine3.11
 EXPOSE 80
 
-RUN apk add --update \
-    curl \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache curl
 
 COPY *.json /
 RUN npm i

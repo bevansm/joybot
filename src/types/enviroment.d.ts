@@ -10,6 +10,7 @@ declare global {
 
       USER: string;
       PASSWORD: string;
+      DISCORD_TOKEN: string;
 
       // The default time between posted votecounts.
       DEFAULT_VOTECOUNT_TIMEOUT: string;
