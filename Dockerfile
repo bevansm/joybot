@@ -1,5 +1,5 @@
 FROM node:14.4.0-alpine3.11
-EXPOSE 80
+EXPOSE 8080
 
 RUN apk add --no-cache curl
 
