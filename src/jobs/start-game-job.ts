@@ -1,9 +1,9 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { IGame, createGame } from '../model/data-types';
-import { getClient } from '../model/Dataclient';
-import IDataclient from '../model/IDataclient';
+import { Game, createGame } from '../model/game-types';
+import { getClient } from '../model/dataclient/Dataclient';
+import IDataclient from '../model/dataclient/AbstractDataclient';
 import logger, { Level } from '../logger/Logger';
 import Manager from './live-game-jobs-manager';
 import manageGameHandler from './manage-game-job';
@@ -40,7 +40,7 @@ export const startGameJob = async (
 export const initGame = async (
   gameId: string,
   dataclient: IDataclient = getClient()
-): Promise<IGame> => {
+): Promise<Game> => {
   const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
   try {
     const $ = await axios.get(baseUrl).then(res => cheerio.load(res.data));
@@ -57,7 +57,7 @@ export const initGame = async (
       title,
     });
     const game = createGame(gameId, parseGameInfo(title));
-    await dataclient.updateGame(game);
+    await dataclient.setGame(game);
     return game;
   } catch (e) {
     logger.log(

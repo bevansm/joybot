@@ -1,5 +1,5 @@
-import { IGame, ISlot, createGame, createSlot, GameType } from './data-types';
-export const createMockGame = (): IGame => ({
+import { Game, Slot, createGame, createSlot, GameType } from './game-types';
+export const createMockGame = (): Game => ({
   ...createGame('430', {
     gameNumber: 56,
     title: 'jammies',
@@ -9,7 +9,7 @@ export const createMockGame = (): IGame => ({
   players: [createSlot({ name: 'jerry' }), createSlot({ name: 'swords' })],
 });
 
-export const createMockPlayers = (): ISlot[] => {
+export const createMockPlayers = (): Slot[] => {
   const players = [0, 1, 2].map(n =>
     createSlot({
       name: `${n}`,

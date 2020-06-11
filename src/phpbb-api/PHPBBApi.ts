@@ -5,11 +5,11 @@ import qs from 'querystring';
 import CookieManager from './CookieManager';
 import { Post } from './bbcode-builder/Post';
 import logger, { Level } from './../logger/Logger';
-import { IGame } from '../model/data-types';
+import { Game } from '../model/game-types';
 import IPHPBBApi, { IPostConfig } from './IPHBBApi';
 
 const PHPBAPI: IPHPBBApi = {
-  post: async (game: IGame, options: IPostConfig) => {
+  post: async (game: Game, options: IPostConfig) => {
     const gamesId = process.env.GAMES_ID;
     const { lynch = null, gameInfo = false, votecount = true } = options;
     const {

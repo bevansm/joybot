@@ -3,8 +3,8 @@ import lodash from 'lodash';
 import path from 'path';
 import fs from 'fs';
 
-import { IGame } from '../../model/data-types';
-import MockDataclient from '../../model/MockDataclient';
+import { Game } from '../../model/game-types';
+import MockDataclient from '../../model/dataclient/MockDataclient';
 import MockPHPBBApi from '../../phpbb-api/MockPHPBBApi';
 import Manager from '../../jobs/live-game-jobs-manager';
 
@@ -94,7 +94,7 @@ describe('integration tests', () => {
       .mockReturnValueOnce([])
       .mockReturnValue([gameId]);
 
-    const updateGameSpy = jest.spyOn(MockDataclient, 'updateGame');
+    const updateGameSpy = jest.spyOn(MockDataclient, 'setGame');
 
     await startGameJob(gameId, MockDataclient);
     game = await MockDataclient.getGame(gameId);
@@ -130,7 +130,7 @@ describe('integration tests', () => {
   });
 });
 
-const writeGame = (game: IGame, page: number) =>
+const writeGame = (game: Game, page: number) =>
   fs.writeFileSync(
     path.resolve(__dirname, `../../../res/vfm-mock/page-${page}.json`),
     JSON.stringify(game)

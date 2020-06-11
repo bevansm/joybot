@@ -1,12 +1,6 @@
 import { merge, isUndefined, isInteger } from 'lodash';
 
-import {
-  IHost,
-  ISlot,
-  IGame,
-  createSlot,
-  IConfig,
-} from '../../model/data-types';
+import { Host, Slot, Game, createSlot, Config } from '../../model/game-types';
 
 import { createPlayerlist as createPlayerlistHelper } from './create-playerlist';
 import {
@@ -44,7 +38,7 @@ export enum HostCommands {
  * @param postContent
  */
 export const handleHostCommand = (
-  game: IGame,
+  game: Game,
   commandString: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
@@ -69,7 +63,7 @@ export const handleHostCommand = (
  * @returns if the command should trigger a print.
  */
 export const applyCommand = (
-  game: IGame,
+  game: Game,
   command: string,
   $?: CheerioStatic,
   postContent?: CheerioElement
@@ -138,29 +132,29 @@ export const applyCommand = (
 export const addHost = (
   name: string,
   hex: string = '',
-  hosts: IHost[]
+  hosts: Host[]
 ): void => {
   if (!name || hasUser(name, hosts)) return;
   if (isValidHex(hex)) hosts.push({ name, hex });
   else hosts.push({ name, hex: '#000' });
 };
 
-const removeHost = (host: string = '', hosts: IHost[]): void => {
+const removeHost = (host: string = '', hosts: Host[]): void => {
   const index = hosts.findIndex(h => isEqual(h.name, host));
   if (index > -1) hosts.splice(index, 1);
 };
 
 const updateHostColor = (
   name: string = '',
-  hosts: IHost[],
+  hosts: Host[],
   color: string
 ): void => {
-  const host = getUser(name, hosts) as IHost;
+  const host = getUser(name, hosts) as Host;
   if (!host || !isValidHex(color)) return;
   host.hex = color;
 };
 
-const addPlayer = (name: string, players: ISlot[]): void => {
+const addPlayer = (name: string, players: Slot[]): void => {
   if (!name || hasUser(name, players)) return;
   players.push(createSlot({ name }));
 };
@@ -173,21 +167,21 @@ const addPlayer = (name: string, players: ISlot[]): void => {
  */
 const updatePlayer = (
   name: string,
-  players: ISlot[],
-  options: Partial<ISlot>
+  players: Slot[],
+  options: Partial<Slot>
 ): void => {
   const player = getUser(name, players);
   if (player) merge(player, options);
 };
 
-const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
+const replacePlayer = (oldName: string, newName: string, game: Game): void => {
   const { players } = game;
   if (oldName && newName && !isEqual(oldName, newName)) {
     // Check if the player we're trying to replace in is already in the game
     if (hasUser(newName, players)) return;
 
     // Grab the old player's slot w/ case insensitivity
-    const player = getUser(oldName, players) as ISlot;
+    const player = getUser(oldName, players) as Slot;
     if (!player) return;
 
     // Grab the actual name we were using to key the player
@@ -201,14 +195,14 @@ const replacePlayer = (oldName: string, newName: string, game: IGame): void => {
 
 const updatePlayerVoteWeight = (
   name: string,
-  players: ISlot[],
+  players: Slot[],
   weight: number,
   splitVote: boolean
 ): void => {
-  const player = getUser(name, players) as ISlot;
+  const player = getUser(name, players) as Slot;
   if (player && (!isUndefined(weight) || !isUndefined(splitVote))) {
     removeAllVotes(player, players);
-    const options: Partial<ISlot> = {
+    const options: Partial<Slot> = {
       voteWeight: weight,
       canSplitVote: Boolean(splitVote),
     };
@@ -221,7 +215,7 @@ const updatePlayerVoteWeight = (
  * @param config - the old config
  * @param options - the new options to merge in
  */
-const updateConfig = (config: IConfig, options: Partial<IConfig>): any =>
+const updateConfig = (config: Config, options: Partial<Config>): any =>
   merge(config, options);
 
 /**
@@ -231,7 +225,7 @@ const updateConfig = (config: IConfig, options: Partial<IConfig>): any =>
  * @param postContent
  */
 const createPlayerlist = (
-  game: IGame,
+  game: Game,
   $: CheerioStatic,
   postContent: CheerioElement
 ): void => {

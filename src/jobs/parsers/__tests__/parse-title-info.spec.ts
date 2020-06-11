@@ -1,9 +1,9 @@
 import { parsePrefix, parseTitle, parseGameInfo } from '../parse-title-info';
-import { IGameInfo, GameType } from '../../../model/data-types';
+import { GameInfo, GameType } from '../../../model/game-types';
 
 interface ISampleInfo {
   raw: string;
-  parsed: IGameInfo;
+  parsed: GameInfo;
 }
 const samples: ISampleInfo[] = [
   {

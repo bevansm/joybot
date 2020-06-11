@@ -10,17 +10,17 @@ import {
   List,
 } from './TagDecorators';
 import { Votecount } from './Votecount';
-import { IGame, ISlot } from '../../model/data-types';
+import { Game, Slot } from '../../model/game-types';
 
 interface PostMaker {
   withVotecount: () => PostMaker;
-  withLynched: (p: ISlot) => PostMaker;
+  withLynched: (p: Slot) => PostMaker;
   withInfo: () => PostMaker;
   withISOs: () => PostMaker;
   finish: () => string;
 }
 
-export const Post = (game: IGame): PostMaker => {
+export const Post = (game: Game): PostMaker => {
   const {
     players,
     hosts,
@@ -33,7 +33,7 @@ export const Post = (game: IGame): PostMaker => {
       post.push(Votecount(players, majority));
       return this;
     },
-    withLynched({ name }: ISlot) {
+    withLynched({ name }: Slot) {
       post.push(Center(Size(`${Bold(name)} will be lynched today.`, 150)));
       return this;
     },

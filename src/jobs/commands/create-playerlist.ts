@@ -1,4 +1,4 @@
-import { ISlot, createSlot } from '../../model/data-types';
+import { Slot, createSlot } from '../../model/game-types';
 
 // The list of substrings that joybot will look for
 const playerlistTitles = ['playerlist', 'players'];
@@ -21,7 +21,7 @@ const playerlistSelectorString = playerlistTitles
 export const createPlayerlist = (
   $: CheerioStatic,
   postContent: CheerioElement
-): ISlot[] => {
+): Slot[] => {
   const playerNames = ($(postContent)
     .find(playerlistSelectorString)
     .nextAll('ol, ul')

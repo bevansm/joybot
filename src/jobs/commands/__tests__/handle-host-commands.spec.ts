@@ -1,5 +1,5 @@
 import { applyCommand, HostCommands } from '../handle-host-command';
-import { createSlot } from '../../../model/data-types';
+import { createSlot } from '../../../model/game-types';
 import { createMockGame } from '../../../model/create-mocks';
 
 describe('command parsing tests', () => {

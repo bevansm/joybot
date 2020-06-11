@@ -1,4 +1,4 @@
-import { ISlot, IHost } from '../../model/data-types';
+import { Slot, Host } from '../../model/game-types';
 import {
   List,
   Strikethrough,
@@ -15,7 +15,7 @@ const ISO = (name: string, topic: string, contents?: string) =>
   );
 
 export const PlayerISOs = (
-  users: ISlot[],
+  users: Slot[],
   topic: string,
   numbered: boolean = true
 ): string =>
@@ -29,7 +29,7 @@ export const PlayerISOs = (
     numbered
   );
 
-export const HostISOs = (hosts: IHost[], topic: string): string =>
+export const HostISOs = (hosts: Host[], topic: string): string =>
   Newlines(
     hosts.map(({ name, hex }) => ISO(name, topic, Bold(Color(name, hex))))
   );

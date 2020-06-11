@@ -1,13 +1,13 @@
-import { ISlot, IGame } from '../model/data-types';
+import { Slot, Game } from '../model/game-types';
 
 export interface IPostConfig {
   votecount?: boolean;
   gameInfo?: boolean;
-  lynch?: ISlot;
+  lynch?: Slot;
 }
 
 interface IPHPBBApi {
-  post: (game: IGame, options: IPostConfig) => Promise<void>;
+  post: (game: Game, options: IPostConfig) => Promise<void>;
 }
 
 export default IPHPBBApi;

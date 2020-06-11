@@ -1,4 +1,4 @@
-import { ISlot } from '../../model/data-types';
+import { Slot } from '../../model/game-types';
 import { removeVote } from './handle-player-command';
 
 /**
@@ -6,7 +6,7 @@ import { removeVote } from './handle-player-command';
  * @param player
  * @param players
  */
-export const removeAllVotes = (player: ISlot, players: ISlot[]): void => {
+export const removeAllVotes = (player: Slot, players: Slot[]): void => {
   const { voting, slotNumber: playerSlotNumber } = player;
   voting.forEach(v => {
     const { slotNumber } = v;

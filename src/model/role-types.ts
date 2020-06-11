@@ -1,12 +1,3 @@
-import { some, merge } from 'lodash';
-
-/**
- * A lower number means higher priority.
- * In the case of ties, processed by "first submitted"
- * A priorty of 0 is regarded as a "no action" priority.
- */
-export type Priority = 0 | 1 | 2 | 3 | 4 | 5;
-
 /**
  * A list of alignments in the game.
  */
@@ -64,15 +55,21 @@ export interface AllowedPhases {
   every: number;
 }
 
+interface Flavored {
+  id: string;
+  name?: string;
+  description?: string;
+  color?: string;
+}
+
 /**
  * An ability.
- * By default, shots is -1 (unlimited) and priority is 5.
+ * By default, shots is -1 (unlimited)
  */
-export interface Ability {
+export interface Ability extends Flavored {
   type: ActionType;
   phases: AllowedPhases;
   shots: number;
-  priority: Priority;
 }
 
 export enum PassiveType {
@@ -89,53 +86,26 @@ export enum PassiveType {
  * A role passive.
  * By default, shots is -1 (unlimited)
  */
-export interface Passive {
+export interface Passive extends Flavored {
   type: PassiveType;
   shots: number;
-}
-
-export interface Action {
-  uuid: string;
-  targets: number[];
-  timestamp: string;
-  ability: Ability;
 }
 
 /**
  * An informed team will recieve a discord chat link.
  * By default, daychat and deadchat are enabled.
  */
-export interface InformedTeam {
-  slotIds: number[];
+export interface InformedTeam extends Flavored {
   daychat: boolean;
   deadchat: boolean;
-  channelID: string;
-  ability?: Ability;
-  action?: {
-    current: Action;
-    player: number;
-  };
-}
-
-// A role
-export interface Role {
-  name: string;
-  color: string;
-  alignment: Alignment;
-  concurrentTargets: number;
-  ability: Ability;
+  abilities: Ability[];
   passives: Passive[];
 }
 
-// returns true iif a role has a passive and/or has shots remaining
-export const hasPassive = (role: Role, type: PassiveType): boolean =>
-  some(role.passives, p => p.type === type && getHasShots(p));
-
-export const removePassiveShot = (role: Role, type: PassiveType) =>
-  role.passives.forEach(p => p.type === type && removeShot(p));
-
-export const getHasShots = (s: { shots: number }) =>
-  s.shots === -1 || !!s.shots;
-
-export const removeShot = (s: { shots: number }) =>
-  merge(s, { shots: !s.shots || s.shots === -1 ? -1 : s.shots - 1 });
+// A role
+export interface Role extends Flavored {
+  alignment: Alignment;
+  concurrentTargets: number;
+  abilities: Ability[];
+  passives: Passive[];
+}

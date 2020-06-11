@@ -1,5 +1,5 @@
 import { isAtMajority, sumVotes, inferUser } from './../../utils/user-utils';
-import { IVote, ISlot, IGame } from '../../model/data-types';
+import { Vote, Slot, Game } from '../../model/game-types';
 import { splitAndFormat } from '../../utils/format-utils';
 import { getUser } from '../../utils/user-utils';
 import { removeAllVotes } from './update-slot-common';
@@ -18,14 +18,14 @@ export enum PlayerCommands {
 export const handlePlayerCommand = (
   commandString: string,
   playerName: string,
-  game: IGame
-): ISlot => {
+  game: Game
+): Slot => {
   const {
     players,
     config: { majority },
   } = game;
 
-  const player = getUser(playerName, players) as ISlot;
+  const player = getUser(playerName, players) as Slot;
   if (!player) return null;
 
   const commands = splitAndFormat(commandString, '/');
@@ -34,7 +34,7 @@ export const handlePlayerCommand = (
       .pop()
       .split(' ')
       .map(c => c.trim());
-    const target = inferUser(args[1] || '', players) as ISlot;
+    const target = inferUser(args[1] || '', players) as Slot;
 
     const {
       voting: playerVoting,
@@ -48,9 +48,9 @@ export const handlePlayerCommand = (
     const { slotNumber: targetSlot, votedBy: targetVotedBy = [] } =
       target || {};
 
-    let playerVote: IVote;
-    let targetVote: IVote;
-    let prevTarget: ISlot;
+    let playerVote: Vote;
+    let targetVote: Vote;
+    let prevTarget: Slot;
 
     switch (args[0].toLowerCase()) {
       case PlayerCommands.UNVOTE:
@@ -97,9 +97,9 @@ export const handlePlayerCommand = (
   return null;
 };
 
-export const removeVote = (slotNumber: number, votes: IVote[]): IVote[] =>
+export const removeVote = (slotNumber: number, votes: Vote[]): Vote[] =>
   votes.filter(v => v.slotNumber !== slotNumber);
 
-const addVote = (vote: IVote, votes: IVote[]): IVote[] => [...votes, vote];
+const addVote = (vote: Vote, votes: Vote[]): Vote[] => [...votes, vote];
 
 export default handlePlayerCommand;

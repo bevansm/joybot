@@ -7,7 +7,9 @@
     "strict-type-predicates": true,
     "object-literal-sort-keys": false,
     "interface-name": false,
+    "interface-over-type-literal": false,
     "no-shadowed-variable": false,
-    "variable-name": false
+    "variable-name": false,
+    "member-ordering": false
   }
 }

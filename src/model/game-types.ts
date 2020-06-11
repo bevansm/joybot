@@ -1,37 +1,31 @@
-import { Role, Action, InformedTeam } from './role-types';
 import { merge } from 'lodash';
 import { numOrUndefined } from '../utils/format-utils';
 
-export interface IVote {
+export interface Vote {
   slotNumber: number;
   weight: number;
 }
 
-export interface ISlot {
+export interface Slot {
   name: string;
   slotNumber: number;
   history: string[];
   isAlive: boolean;
-  voting: IVote[];
-  votedBy: IVote[];
+  voting: Vote[];
+  votedBy: Vote[];
   voteWeight: number;
   canSplitVote: boolean;
   extraVotesToLynch: number;
-  role?: Role;
-  actions?: {
-    current: Action[];
-    cache: Action[][];
-  };
 }
 
-export interface IHost {
+export interface Host {
   name: string;
   hex: string;
 }
 
-export type INamed = ISlot | IHost;
+export type Named = Slot | Host;
 
-export interface IConfig {
+export interface Config {
   interval: number;
   autolock: boolean;
   majority: number;
@@ -65,35 +59,34 @@ export interface GamePhase {
   no: number;
 }
 
-export interface IGameInfo {
+export interface GameInfo {
   type: GameType;
   gameNumber: number;
   title: string;
   letter?: string;
 }
 
-interface IGameMain {
-  config: IConfig;
+interface GameMain {
+  config: Config;
   id: string;
-  hosts: IHost[];
-  players: ISlot[];
-  informedTeams: InformedTeam[];
+  hosts: Host[];
+  players: Slot[];
   lastPost: string;
   phase: GamePhase;
 }
 
-export type IGame = IGameMain & Partial<IGameInfo>;
+export type Game = GameMain & Partial<GameInfo>;
 
 const getInterval = () =>
   numOrUndefined(process.env.DEFAULT_VOTECOUNT_TIMEOUT) || 60;
-export const DefaultConfig: IConfig = {
+export const DefaultConfig: Config = {
   interval: getInterval(),
   autolock: false,
   majority: 1,
   enabled: true,
 };
 
-const DefaultSlot: ISlot = {
+const DefaultSlot: Slot = {
   name: '',
   isAlive: true,
   slotNumber: -1,
@@ -105,16 +98,15 @@ const DefaultSlot: ISlot = {
   votedBy: null,
 };
 
-export const createSlot = (config?: Partial<ISlot>): ISlot =>
+export const createSlot = (config?: Partial<Slot>): Slot =>
   merge({}, DefaultSlot, { history: [], voting: [], votedBy: [] }, config);
 
-export const createGame = (id: string, info: IGameInfo): IGame =>
+export const createGame = (id: string, info: GameInfo): Game =>
   merge(
     {
       id,
       hosts: [],
       players: [],
-      informedTeams: [],
       config: { ...DefaultConfig, interval: getInterval() },
       lastPost: '0',
       phase: {
@@ -125,7 +117,7 @@ export const createGame = (id: string, info: IGameInfo): IGame =>
     { ...info }
   );
 
-export const createInfo = (config?: Partial<IGameInfo>): IGameInfo =>
+export const createInfo = (config?: Partial<GameInfo>): GameInfo =>
   merge(
     {
       type: GameType.UNKNOWN,

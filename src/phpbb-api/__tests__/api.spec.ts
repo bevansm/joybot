@@ -1,9 +1,9 @@
-import { IGame, createGame, GameType } from '../../model/data-types';
+import { Game, createGame, GameType } from '../../model/game-types';
 import PHPBAPI from '../PHPBBApi';
 describe('phpbb api tests', () => {
   const sidDescribe = process.env._S ? describe : describe.skip;
   sidDescribe('integration with sid on localhost', () => {
-    const game: IGame = createGame('1234', {
+    const game: Game = createGame('1234', {
       type: GameType.VFM,
       gameNumber: 89,
       title: 'Right into your dms',

@@ -3,9 +3,9 @@ import { isUndefined } from 'lodash';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-import { ISlot, IGame, IHost } from '../model/data-types';
-import IDataclient from '../model/IDataclient';
-import { getClient } from '../model/Dataclient';
+import { Slot, Game, Host } from '../model/game-types';
+import IDataclient from '../model/dataclient/AbstractDataclient';
+import { getClient } from '../model/dataclient/Dataclient';
 import IPHPBBApi from '../phpbb-api/IPHBBApi';
 import PHPBAPI from '../phpbb-api/PHPBBApi';
 import Manager from './live-game-jobs-manager';
@@ -25,13 +25,13 @@ const manageGameJob = async (
   logger.log(Level.INFO, 'Scraping game info...', { gameId });
 
   const postsPerPage = Number(process.env.POSTS_PER_PAGE);
-  const game: IGame = await dataclient.getGame(gameId);
+  const game: Game = await dataclient.getGame(gameId);
   const { lastPost, config } = game;
 
   const baseUrl = `${process.env.FORUM_URL}/viewtopic.php?f=${process.env.GAMES_ID}&t=${gameId}`;
 
   let queryString = `&p=${lastPost}`;
-  let lynchedPlayer: ISlot;
+  let lynchedPlayer: Slot;
   let shouldPrint;
   let pCurrentPost: string = `p${lastPost}`;
   let pCurrLastPost;
@@ -77,16 +77,16 @@ const manageGameJob = async (
     });
   if (lynchedPlayer) Manager.stopJob(gameId);
 
-  await dataclient.updateGame({ ...game, lastPost: pCurrentPost.substring(1) });
+  await dataclient.setGame({ ...game, lastPost: pCurrentPost.substring(1) });
 };
 
 interface PostHandlerReply {
-  lynched?: ISlot;
+  lynched?: Slot;
   print?: boolean;
 }
 
 const handlePost = (
-  game: IGame,
+  game: Game,
   post: CheerioElement,
   $: CheerioStatic,
   allowPlayers: boolean = false
@@ -107,7 +107,7 @@ const handlePost = (
 
 const handleHostPost = (
   name: string,
-  game: IGame,
+  game: Game,
   content: CheerioElement,
   $: CheerioStatic
 ): PostHandlerReply => {
@@ -131,7 +131,7 @@ const handleHostPost = (
     }
   }
 
-  const host = getUser(name, hosts) as IHost;
+  const host = getUser(name, hosts) as Host;
   if (host) {
     const { hex } = host;
     if (hex === '#000') host.hex = parseHex(content, $) || '#000';
@@ -161,7 +161,7 @@ const handleHostPost = (
 
 const handleUserPost = (
   name: string,
-  game: IGame,
+  game: Game,
   content: CheerioElement,
   $: CheerioStatic
 ): PostHandlerReply => {
@@ -169,7 +169,7 @@ const handleUserPost = (
   $(content).find('.quotecontent').remove();
 
   const { players } = game;
-  const player = getUser(name, players) as ISlot;
+  const player = getUser(name, players) as Slot;
   if (player && player.isAlive) {
     const bolded = $(content)
       .find('span[style*="font-weight: bold"]')

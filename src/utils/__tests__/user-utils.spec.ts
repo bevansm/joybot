@@ -1,9 +1,9 @@
 import { isAtMajority } from '../user-utils';
-import { createSlot, IVote } from '../../model/data-types';
+import { createSlot, Vote } from '../../model/game-types';
 
 describe('user utils tests', () => {
   describe('maj tests', () => {
-    const voters: IVote[] = [
+    const voters: Vote[] = [
       { slotNumber: 0, weight: 1 },
       { slotNumber: 2, weight: 3 },
     ];

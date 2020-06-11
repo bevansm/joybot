@@ -5,11 +5,11 @@ import {
   numOrUndefined,
   isEqual,
 } from '../../utils/format-utils';
-import { IGameInfo, GameType, createInfo } from '../../model/data-types';
+import { GameInfo, GameType, createInfo } from '../../model/game-types';
 import logger, { Level } from '../../logger/Logger';
 import { isUndefined } from 'lodash';
 
-export const parseGameInfo = (rawInfo: string): IGameInfo => {
+export const parseGameInfo = (rawInfo: string): GameInfo => {
   const delim = findDelim(rawInfo);
   const titleArray = delim ? splitAndFormat(rawInfo, delim) : [rawInfo];
   const { type, gameNumber, letter } = parsePrefix(titleArray[0]);
@@ -36,7 +36,7 @@ export const parseGameInfo = (rawInfo: string): IGameInfo => {
     }
   }
 
-  const config: Partial<IGameInfo> = {
+  const config: Partial<GameInfo> = {
     type: type as GameType,
     title,
     gameNumber,

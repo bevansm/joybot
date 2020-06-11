@@ -1,8 +1,8 @@
 import { Center } from './TagDecorators';
 import { sumVotes } from '../../utils/user-utils';
-import { ISlot } from '../../model/data-types';
+import { Slot } from '../../model/game-types';
 
-export const Votecount = (slots: ISlot[], majority: number): string => {
+export const Votecount = (slots: Slot[], majority: number): string => {
   const sorted = [...slots].sort(
     (a, b) => sumVotes(b.votedBy) - sumVotes(a.votedBy)
   );
