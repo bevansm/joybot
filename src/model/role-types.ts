@@ -1,3 +1,5 @@
+import { GamePhaseType } from './game-types';
+
 /**
  * A list of alignments in the game.
  */
@@ -29,9 +31,9 @@ export const FeedbackMessages = {
 /**
  * All supported action types.
  */
-export enum ActionType {
+export enum AbilityType {
   HEAL = 'heal',
-  KILL = 'kill',
+  VIG = 'vig',
   LK = 'lookout',
   COP = 'cop',
   BD = 'bodydouble',
@@ -40,16 +42,20 @@ export enum ActionType {
   FRAME = 'framer',
   INVEST = 'investigate',
   WITCH = 'redirect',
+  FACTIONAL_KILL = 'factional_kill',
 }
 
 /**
  * The phase in which an action may occur.
  * By default, night is true, day is false,
- * even and odd are true, and every is set to one.
+ * even and odd are true, and every is set to two.
+ *
+ * Note that every is absolute across ALL phase transitions.
+ * Every 1 phase is every phase, every 2 phases is
+ * every other phase, ect.
  */
 export interface AllowedPhases {
-  night: boolean;
-  day: boolean;
+  types: GamePhaseType[];
   even: boolean;
   odd: boolean;
   every: number;
@@ -64,11 +70,12 @@ interface Flavored {
 
 /**
  * An ability.
- * By default, shots is -1 (unlimited)
+ * By default, shots is -1 (unlimited) and targets is 1
  */
 export interface Ability extends Flavored {
-  type: ActionType;
+  type: AbilityType;
   phases: AllowedPhases;
+  targets: number;
   shots: number;
 }
 

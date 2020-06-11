@@ -1,6 +1,7 @@
 import { Role, InformedTeam, Ability, Passive } from './role-types';
 
 export interface Action {
+  player: number;
   targets: number[];
   timestamp: string;
   abilityId: string;

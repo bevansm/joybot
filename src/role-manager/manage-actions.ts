@@ -3,6 +3,8 @@ import {
   ShotMap,
   GameRolesState,
   EntityRoleState,
+  Action,
+  PlayerRoleState,
 } from '../model/role-states';
 import { last } from 'lodash';
 
@@ -39,18 +41,36 @@ export const startNextPhaseGame = (grs: GameRolesState) => {
   startNextPhaseEntity(teams);
 };
 
-export const addAction = (
+export const addAction = (ers: EntityRoleState, action: Action) =>
+  ers.actions.current.push(action);
+
+export const addNewAction = (
   ers: EntityRoleState,
+  player: number,
   targets: number[],
   abilityId: string
 ) =>
-  ers.actions.current.push({
+  addAction(ers, {
+    player,
     targets,
     abilityId,
     timestamp: new Date().toUTCString(),
   });
 
-export const trimCurrentActions = (ers: EntityRoleState, length = 1) => {
+export const addNewRoleAction = (
+  ers: PlayerRoleState,
+  targets: number[],
+  abilityId: string
+) => addNewAction(ers, ers.slotNumber, targets, abilityId);
+
+export const removeAction = (ers: EntityRoleState, abilityId: string) => {
+  const {
+    actions: { current },
+  } = ers;
+  ers.actions.current = current.filter(a => a.abilityId !== abilityId);
+};
+
+export const trimActions = (ers: EntityRoleState, length = 1) => {
   const {
     actions,
     actions: { current },
