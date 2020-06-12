@@ -12,14 +12,14 @@ enum Alignment {
 /**
  * All feedback messages.
  */
-export const FeedbackMessages = {
+export const Feedback = {
   attack: {
     immune: 'You were attached last night, but you were immune!',
     healed: 'You were attacked last night, but a player healed you!',
     failed: 'Your attack failed last night.',
   },
   roleblock: {
-    roleblocked: 'You were roleblocked.',
+    default: 'You were roleblocked.',
     strong:
       'You were roleblocked, but due to your strength, your action(s) still succeeded!',
   },
@@ -32,18 +32,37 @@ export const FeedbackMessages = {
  * All supported action types.
  */
 export enum AbilityType {
+  RB = 'roleblock',
+  WITCH = 'redirect',
+  FRAME = 'framer',
+
+  BD = 'bodydouble',
   HEAL = 'heal',
+
   VIG = 'vig',
+  FACTIONAL_KILL = 'factional_kill',
+
   LK = 'lookout',
   COP = 'cop',
-  BD = 'bodydouble',
-  RB = 'roleblock',
   TRACK = 'tracker',
-  FRAME = 'framer',
   INVEST = 'investigate',
-  WITCH = 'redirect',
-  FACTIONAL_KILL = 'factional_kill',
 }
+
+const primaryActions = [AbilityType.RB, AbilityType.WITCH, AbilityType.FRAME];
+const protectiveActions = [AbilityType.BD, AbilityType.HEAL];
+const killingActions = [AbilityType.VIG, AbilityType.FACTIONAL_KILL];
+const investActions = [
+  AbilityType.LK,
+  AbilityType.COP,
+  AbilityType.TRACK,
+  AbilityType.INVEST,
+];
+
+export const orderedActions: AbilityType[] = primaryActions.concat(
+  protectiveActions,
+  killingActions,
+  investActions
+);
 
 /**
  * The phase in which an action may occur.
@@ -70,12 +89,12 @@ interface Flavored {
 
 /**
  * An ability.
- * By default, shots is -1 (unlimited) and targets is 1
+ * By default, shots is -1 (unlimited) and targetsPerShot is 1
  */
 export interface Ability extends Flavored {
   type: AbilityType;
   phases: AllowedPhases;
-  targets: number;
+  targetsPerShot: number;
   shots: number;
 }
 
